@@ -332,6 +332,7 @@ zero_malloc=""
 trace_backend="nop"
 trace_file="trace"
 spice=""
+smartcard="no"
 
 # OS specific
 if check_define __linux__ ; then
@@ -739,6 +740,10 @@ for opt do
   ;;
   --enable-vhost-net) vhost_net="yes"
   ;;
+  --disable-smartcard) smartcard="no"
+  ;;
+  --enable-smartcard) smartcard="yes"
+  ;;
   --*dir)
   ;;
   *) echo "ERROR: unknown option $opt"; show_help="yes"
@@ -934,6 +939,8 @@ echo "  --trace-file=NAME        Full PATH,NAME of file to store traces"
 echo "                           Default:trace-<pid>"
 echo "  --disable-spice          disable spice"
 echo "  --enable-spice           enable spice"
+echo "  --disable-smartcard      disable smartcard support"
+echo "  --enable-smartcard       enable smartcard support"
 echo ""
 echo "NOTE: The object files are built at the place where configure is launched"
 exit 1
@@ -2354,6 +2361,7 @@ echo "vhost-net support $vhost_net"
 echo "Trace backend     $trace_backend"
 echo "Trace output file $trace_file-<pid>"
 echo "spice support     $spice"
+echo "smartcard support $smartcard"
 
 if test $sdl_too_old = "yes"; then
 echo "-> Your SDL version is too old - please upgrade to have SDL support"
@@ -2615,6 +2623,10 @@ fi
 
 if test "$spice" = "yes" ; then
   echo "CONFIG_SPICE=y" >> $config_host_mak
+fi
+
+if test "$smartcard" = "yes" ; then
+  echo "CONFIG_SMARTCARD=y" >> $config_host_mak
 fi
 
 # XXX: suppress that
