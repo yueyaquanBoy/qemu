@@ -177,6 +177,7 @@ void qbus_create_inplace(BusState *bus, BusInfo *info,
                          DeviceState *parent, const char *name);
 BusState *qbus_create(BusInfo *info, DeviceState *parent, const char *name);
 void qbus_free(BusState *bus);
+DeviceState *qdev_find_recursive(BusState *bus, const char *id);
 
 #define FROM_QBUS(type, dev) DO_UPCAST(type, qbus, dev)
 
