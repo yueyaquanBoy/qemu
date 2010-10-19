@@ -317,6 +317,7 @@ void usb_unregister_port(USBBus *bus, USBPort *port);
 int usb_device_attach(USBDevice *dev);
 int usb_device_detach(USBDevice *dev);
 int usb_device_delete_addr(int busnr, int addr);
+USBDevice *usb_device_by_id(const char* id);
 
 static inline USBBus *usb_bus_from_device(USBDevice *d)
 {

@@ -189,6 +189,22 @@ int usb_device_detach(USBDevice *dev)
     return 0;
 }
 
+USBDevice *usb_device_by_id(const char* id)
+{
+    USBBus *bus;
+    DeviceState *qdev;
+    USBDevice *dev;
+
+    QTAILQ_FOREACH(bus, &busses, next) {
+        qdev = qdev_find_recursive(&bus->qbus, id);
+        if (qdev != NULL) {
+            dev = DO_UPCAST(USBDevice, qdev, qdev);
+            return dev;
+        }
+    }
+    return NULL;
+}
+
 int usb_device_delete_addr(int busnr, int addr)
 {
     USBBus *bus;
