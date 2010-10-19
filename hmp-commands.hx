@@ -516,6 +516,44 @@ hub. @var{devname} has the syntax @code{bus.addr}. Use the monitor
 command @code{info usb} to see the devices you can remove.
 ETEXI
 
+#ifdef CONFIG_USB_MONITOR_ATTACH_DETACH
+    {
+        .name       = "usb_attach",
+        .args_type  = "id:s",
+        .params     = "device",
+        .help       = "attach USB device by id",
+        .mhandler.cmd = do_usb_attach,
+    },
+
+STEXI
+@item usb_attach @var{id}
+@findex usb_attach
+
+Attach the USB device with id @var{id} to the QEMU virtual USB
+hub. @var{id} should be a previously detached usb device. Use
+@code{info qtree} to see devices that can be attached. This
+command is for debugging usage only.
+ETEXI
+
+    {
+        .name       = "usb_detach",
+        .args_type  = "id:s",
+        .params     = "device",
+        .help       = "remove USB device by id",
+        .mhandler.cmd = do_usb_detach,
+    },
+
+STEXI
+@item usb_detach @var{id}
+@findex usb_detach
+
+Detach the USB device @var{id} from the QEMU virtual USB
+hub. Use the monitor command @code{info usb} to see the
+devices you can detach. This command is for debugging usage
+only.
+ETEXI
+#endif // CONFIG_USB_MONITOR_ATTACH_DETACH
+
     {
         .name       = "device_add",
         .args_type  = "device:O",
