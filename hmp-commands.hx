@@ -1157,6 +1157,7 @@ ETEXI
         .args_type  = "item:s?",
         .params     = "[subcommand]",
         .help       = "show various information about the system state",
+        .sub_args_type = do_info_sub_args_type,
         .mhandler.cmd = do_info,
     },
 

@@ -108,6 +108,7 @@ typedef struct mon_cmd_t {
     const char *params;
     const char *help;
     void (*user_print)(Monitor *mon, const QObject *data);
+    const char *(*sub_args_type)(const QDict *qdict);
     union {
         void (*info)(Monitor *mon);
         void (*info_new)(Monitor *mon, QObject **ret_data);
@@ -3501,6 +3502,7 @@ static const mon_cmd_t *monitor_parse_command(Monitor *mon,
     char cmdname[256];
     char buf[1024];
     char *key;
+    int did_sub_args_type = 0;
 
 #ifdef DEBUG
     monitor_printf(mon, "command='%s'\n", cmdline);
@@ -3521,8 +3523,17 @@ static const mon_cmd_t *monitor_parse_command(Monitor *mon,
     typestr = cmd->args_type;
     for(;;) {
         typestr = key_get_info(typestr, &key);
-        if (!typestr)
+        /* Allow for two level parameters definition. Call sub_args_type only
+         * after finished parsing existing args */
+        if (!typestr && cmd->sub_args_type != NULL && !did_sub_args_type) {
+            if ((typestr = cmd->sub_args_type(qdict)) != NULL) {
+                typestr = key_get_info(typestr, &key);
+            }
+            did_sub_args_type = 1;
+        }
+        if (!typestr) {
             break;
+        }
         c = *typestr;
         typestr++;
         switch(c) {
