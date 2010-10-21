@@ -641,6 +641,26 @@ static void user_async_info_handler(Monitor *mon, const mon_cmd_t *cmd)
     }
 }
 
+static const char* do_info_sub_args_type(const QDict *qdict)
+{
+    const mon_cmd_t *cmd;
+    const char *item = qdict_get_try_str(qdict, "item");
+
+    if (!item) {
+        return NULL;
+    }
+    for (cmd = info_cmds; cmd->name != NULL; cmd++) {
+        if (compare_cmd(item, cmd->name)) {
+            break;
+        }
+    }
+
+    if (cmd->name == NULL) {
+        return NULL;
+    }
+    return cmd->args_type;
+}
+
 static void do_info(Monitor *mon, const QDict *qdict)
 {
     const mon_cmd_t *cmd;
@@ -670,7 +690,11 @@ static void do_info(Monitor *mon, const QDict *qdict)
             qobject_decref(info_data);
         }
     } else {
-        cmd->mhandler.info(mon);
+        if (cmd->params != NULL && cmd->params[0] != 0) {
+            cmd->mhandler.cmd(mon, qdict);
+        } else {
+            cmd->mhandler.info(mon);
+        }
     }
 
     return;
@@ -2587,10 +2611,10 @@ static const mon_cmd_t info_cmds[] = {
     },
     {
         .name       = "qtree",
-        .args_type  = "",
-        .params     = "",
-        .help       = "show device tree",
-        .mhandler.info = do_info_qtree,
+        .args_type  = "id:s?",
+        .params     = "device",
+        .help       = "show device tree (optional root bus/device)",
+        .mhandler.cmd = do_info_qtree,
     },
     {
         .name       = "qdm",

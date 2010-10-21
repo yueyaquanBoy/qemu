@@ -774,10 +774,21 @@ static void qbus_print(Monitor *mon, BusState *bus, int indent)
 }
 #undef qdev_printf
 
-void do_info_qtree(Monitor *mon)
+void do_info_qtree(Monitor *mon, const QDict *qdict)
 {
-    if (main_system_bus)
-        qbus_print(mon, main_system_bus, 0);
+    const char *id;
+    BusState *bus = main_system_bus;
+    DeviceState *dev;
+
+    if (qdict != NULL && (id = qdict_get_try_str(qdict, "id")) != NULL) {
+        bus = qbus_find_recursive(main_system_bus, id, NULL);
+        if (bus == NULL && (dev = qdev_find_recursive(main_system_bus, id)) != NULL) {
+            bus = dev->parent_bus;
+        }
+    }
+    if (bus) {
+        qbus_print(mon, bus, 0);
+    }
 }
 
 void do_info_qdm(Monitor *mon)
