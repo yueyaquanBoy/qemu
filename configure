@@ -2130,6 +2130,27 @@ EOF
   fi
 fi
 
+# check for libcaccard for smartcard support
+if test "$smartcard" != "no" ; then
+  cat > $TMPC << EOF
+#include <vscard_common.h>
+int main() { return 0; }
+EOF
+  smartcard_cflags=$($pkgconfig --cflags cac_card cac_card 2>/dev/null)
+  smartcard_libs=$($pkgconfig --libs cac_card cac_card 2>/dev/null)
+  if $pkgconfig --atleast-version=0.0.1 cac_card &&\
+     compile_prog "$smartcard_cflags" "$smartcard_libs" ; then
+    smartcard="yes"
+    libs_softmmu="$smartcard_libs $libs_softmmu"
+    QEMU_CFLAGS="$QEMU_CFLAGS $smartcard_cflags"
+  else
+    if test "smartcard" = "yes" ; then
+      feature_not_found "smartcard"
+    fi
+    smartcard="no"
+  fi
+fi
+
 ##########################################
 
 ##########################################
