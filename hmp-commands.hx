@@ -516,7 +516,6 @@ hub. @var{devname} has the syntax @code{bus.addr}. Use the monitor
 command @code{info usb} to see the devices you can remove.
 ETEXI
 
-#ifdef CONFIG_USB_MONITOR_ATTACH_DETACH
     {
         .name       = "usb_attach",
         .args_type  = "id:s",
@@ -552,7 +551,6 @@ hub. Use the monitor command @code{info usb} to see the
 devices you can detach. This command is for debugging usage
 only.
 ETEXI
-#endif // CONFIG_USB_MONITOR_ATTACH_DETACH
 
     {
         .name       = "device_add",

@@ -868,7 +868,6 @@ void do_usb_del(Monitor *mon, const QDict *qdict)
     }
 }
 
-#ifdef CONFIG_USB_MONITOR_ATTACH_DETACH
 void do_usb_attach(Monitor *mon, const QDict *qdict)
 {
     const char *id = qdict_get_str(qdict, "id");
@@ -899,7 +898,6 @@ void do_usb_detach(Monitor *mon, const QDict *qdict)
         error_report("could not detach USB device '%s'", id);
     }
 }
-#endif // CONFIG_USB_MONITOR_ATTACH_DETACH
 
 /***********************************************************/
 /* PCMCIA/Cardbus */

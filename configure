@@ -293,7 +293,6 @@ gprof="no"
 debug_tcg="no"
 debug_mon="no"
 debug="no"
-usb_monitor_attach_detach="no"
 strip_opt="yes"
 bigendian="no"
 mingw32="no"
@@ -591,10 +590,7 @@ for opt do
       debug_tcg="yes"
       debug_mon="yes"
       debug="yes"
-      usb_monitor_attach_detach="yes"
       strip_opt="no"
-  ;;
-  --enable-usb-mon-detach) usb_monitor_attach_detach="yes"
   ;;
   --enable-sparse) sparse="yes"
   ;;
@@ -856,7 +852,6 @@ echo "  --sysconfdir=PATH        install config in PATH/qemu"
 echo "  --enable-debug-tcg       enable TCG debugging"
 echo "  --disable-debug-tcg      disable TCG debugging (default)"
 echo "  --enable-debug           enable common debug build options"
-echo "  --enable-usb-mon-detach  enable usb monitor attach & detach commands"
 echo "  --enable-sparse          enable sparse checker"
 echo "  --disable-sparse         disable sparse checker (default)"
 echo "  --disable-strip          disable stripping binaries"
@@ -2308,7 +2303,6 @@ echo "host big endian   $bigendian"
 echo "target list       $target_list"
 echo "tcg debug enabled $debug_tcg"
 echo "Mon debug enabled $debug_mon"
-echo "usb mon detach    $usb_monitor_attach_detach"
 echo "gprof enabled     $gprof"
 echo "sparse enabled    $sparse"
 echo "strip binaries    $strip_opt"
@@ -2399,9 +2393,6 @@ if test "$debug_mon" = "yes" ; then
 fi
 if test "$debug" = "yes" ; then
   echo "CONFIG_DEBUG_EXEC=y" >> $config_host_mak
-fi
-if test "$usb_monitor_attach_detach" = yes ; then
-  echo "CONFIG_USB_MONITOR_ATTACH_DETACH=y" >> $config_host_mak
 fi
 if test "$strip_opt" = "yes" ; then
   echo "STRIP=${strip}" >> $config_host_mak

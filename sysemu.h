@@ -182,10 +182,8 @@ extern struct soundhw soundhw[];
 
 void do_usb_add(Monitor *mon, const QDict *qdict);
 void do_usb_del(Monitor *mon, const QDict *qdict);
-#ifdef CONFIG_USB_MONITOR_ATTACH_DETACH
 void do_usb_attach(Monitor *mon, const QDict *qdict);
 void do_usb_detach(Monitor *mon, const QDict *qdict);
-#endif
 void usb_info(Monitor *mon);
 
 void rtc_change_mon_event(struct tm *tm);
