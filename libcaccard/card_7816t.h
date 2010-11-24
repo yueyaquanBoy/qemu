@@ -23,12 +23,12 @@ struct VCardResponseStruct {
 };
 
 #define VCARD_RESPONSE_NEW_STATIC_STATUS(stat) \
-const static VCardResponse VCardResponse##stat = \
+static const VCardResponse VCardResponse##stat = \
         {(unsigned char *)&VCardResponse##stat.b_sw1, (stat), ((stat) >> 8), ((stat) & 0xff), \
          0, 2, VCARD_STATIC};
 
 #define VCARD_RESPONSE_NEW_STATIC_STATUS_BYTES(sw1, sw2) \
-const static VCardResponse VCARDResponse##sw1 = \
+static const VCardResponse VCARDResponse##sw1 = \
         {(unsigned char *)&VCardResponse##name.b_sw1, ((sw1) << 8 | (sw2)), (sw1), (sw2), \
          0, 2, VCARD_STATIC};
 
