@@ -48,23 +48,6 @@ VCardAPDU *vcard_apdu_new(unsigned char *raw_apdu, int len, unsigned short *stat
 void vcard_apdu_delete(VCardAPDU *apdu);
 
 /*
- * Constructor for a VCardApplet
- */
-VCardApplet *vcard_new_applet(VCardProcessAPDU applet_process_function,
-                              VCardResetApplet applet_reset_function,
-                              unsigned char *aid, int aid_len);
-
-/*
- * destructor for a VCardApplet
- *  Can be called with a NULL applet
- */
-void vcard_delete_applet(VCardApplet *applet);
-
-
-/* add an applet to the current card */
-VCardStatus vcard_add_applet(VCard *card, VCardApplet *applet);
-
-/*
  * APDU processing starts here. This routes the card processing stuff to the
  * right location. Always returns a valid response.
  */

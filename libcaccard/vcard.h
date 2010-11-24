@@ -24,12 +24,19 @@ void vcard_reset(VCard *card, VCardPower power);
 /*
  * applet utilities 
  */
-/* constuctor */
-VCardApplet *vcard_new_applet(VCardProcessAPDU applet_process_function, 
+/*
+ * Constructor for a VCardApplet
+ */
+VCardApplet *vcard_new_applet(VCardProcessAPDU applet_process_function,
                               VCardResetApplet applet_reset_function,
                               unsigned char *aid, int aid_len);
-/* destructor */
+
+/*
+ * destructor for a VCardApplet
+ *  Can be called with a NULL applet
+ */
 void vcard_delete_applet(VCardApplet *applet);
+
 /* accessor - set the card type specific private data */
 void vcard_set_applet_private(VCardApplet *applet, VCardAppletPrivate *_private,
                               VCardAppletPrivateFree private_free);
