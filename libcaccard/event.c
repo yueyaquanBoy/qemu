@@ -52,8 +52,7 @@ static VEvent *vevent_queue_tail = NULL;
 static mutex_t vevent_queue_lock;
 static condition_t vevent_queue_condition;
 
-void
-vevent_queue_init()
+void vevent_queue_init(void)
 {
     MUTEX_INIT(vevent_queue_lock);
     CONDITION_INIT(vevent_queue_condition);
@@ -89,8 +88,7 @@ vevent_dequeue_vevent(void)
     return vevent;
 }
 
-VEvent *
-vevent_wait_next_vevent()
+VEvent * vevent_wait_next_vevent(void)
 {
     VEvent *vevent;
 
@@ -102,8 +100,7 @@ vevent_wait_next_vevent()
     return vevent;
 }
 
-VEvent *
-vevent_get_next_vevent()
+VEvent * vevent_get_next_vevent(void)
 {
     VEvent *vevent;
 
