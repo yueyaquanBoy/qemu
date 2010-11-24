@@ -254,7 +254,7 @@ vreader_list_entry_new(VReader *reader)
     return new_reader_list_entry;
 }
 
-void
+static void
 vreader_list_entry_delete(VReaderListEntry *entry)
 {
     if (entry == NULL) {
@@ -266,7 +266,7 @@ vreader_list_entry_delete(VReaderListEntry *entry)
 
 
 static VReaderList *
-vreader_list_new()
+vreader_list_new(void)
 {
     VReaderList *new_reader_list;
 
@@ -352,21 +352,21 @@ vreader_dequeue(VReaderList *list, VReaderListEntry *entry)
 static VReaderList *vreader_list = NULL;
 static mutex_t vreader_list_mutex;
 
-void
-vreader_list_init()
+static void
+vreader_list_init(void)
 {
     vreader_list = vreader_list_new();
     MUTEX_INIT(vreader_list_mutex);
 }
 
 static void
-vreader_list_lock()
+vreader_list_lock(void)
 {
     MUTEX_LOCK(vreader_list_mutex);
 }
 
 static void
-vreader_list_unlock()
+vreader_list_unlock(void)
 {
     MUTEX_UNLOCK(vreader_list_mutex);
 }
@@ -393,7 +393,7 @@ vreader_copy_list(VReaderList *list)
 }
 
 VReaderList *
-vreader_get_reader_list()
+vreader_get_reader_list(void)
 {
     VReaderList *new_reader_list;
 
@@ -507,7 +507,7 @@ vreader_insert_card(VReader *reader, VCard *card)
  * initialize all the static reader structures
  */
 void
-vreader_init()
+vreader_init(void)
 {
     vreader_list_init();
 }
