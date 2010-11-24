@@ -1,6 +1,7 @@
 /*
  * implement the applets for the CAC card.
  */
+#include "cac.h"
 #include "vcard.h"
 #include "vcard_emul.h"
 #include "card_7816.h"
