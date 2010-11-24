@@ -65,7 +65,7 @@ struct VCardEmulOptionsStruct {
     VirtualReaderOptions *vreader;
     int vreader_count;
     VCardEmulType hw_card_type;
-    char *hw_type_params;
+    const char *hw_type_params;
     PRBool use_hw;
 };
 
@@ -259,7 +259,7 @@ VCard7816Status
 vcard_emul_login(VCard *card, unsigned char *pin, int pin_len)
 {
     PK11SlotInfo *slot;
-    char *pin_string = NULL;
+    unsigned char *pin_string = NULL;
     int i;
     SECStatus rv;
 
@@ -271,7 +271,7 @@ vcard_emul_login(VCard *card, unsigned char *pin, int pin_len)
       * create a separate process to handle each guest instance. If we needed to handle multiple
       * guests from one process, then we would need to keep a lot of extra state in our card
       * structure*/
-    pin_string = (char *)malloc(pin_len+1);
+    pin_string = malloc(pin_len+1);
     if (pin_string == NULL) {
         return VCARD7816_STATUS_EXC_ERROR_MEMORY_FAILURE;
     }
@@ -415,7 +415,7 @@ vcard_emul_reader_get_slot(VReader *vreader)
  *  Card ATR's map to physical cards. VCARD_ATR_PREFIX will set appropriate historical bytes for
  *  any software emulated card. The remaining bytes can be used to indicate the actual emulator
  */
-const static unsigned char nss_atr[] = { VCARD_ATR_PREFIX(3), 'N', 'S', 'S' };
+static const unsigned char nss_atr[] = { VCARD_ATR_PREFIX(3), 'N', 'S', 'S' };
 /*const static unsigned char nss_atr[] = { 0x3B, 0x6B, 0, 0, 0x80, 0x65, 0xB0, 
                                          0x83, 1, 4, 0x74, 0x83, 0,  0x90, 0  }; */
 void 
@@ -546,7 +546,7 @@ vcard_emul_mirror_card(VReader *vreader)
 }
 
 static VCardEmulType default_card_type = VCARD_EMUL_NONE;
-static char *default_type_params = "";
+static const char *default_type_params = "";
 
 /*
  * This thread looks for card and reader insertions and puts events on the event queue
@@ -628,7 +628,15 @@ vcard_emul_new_event_thread(SECMODModule *module)
                           module, PR_PRIORITY_HIGH, PR_GLOBAL_THREAD, PR_UNJOINABLE_THREAD, 0);
 }
 
-static const VCardEmulOptions default_options = { NULL, NULL, 0, VCARD_EMUL_CAC, "", PR_TRUE };
+static const VCardEmulOptions default_options = {
+    .nss_db = NULL,
+    .vreader = NULL,
+    .vreader_count = 0,
+    .hw_card_type = VCARD_EMUL_CAC,
+    .hw_type_params = "",
+    .use_hw = PR_TRUE
+};
+
 
 /*
  *  NSS needs the app to supply a password prompt. In our case the only time the password is
@@ -801,7 +809,7 @@ vcard_emul_init(const VCardEmulOptions *options)
 
     if (need_module) {
         SECMODModule *module;
-        module = SECMOD_LoadUserModule("library=libcoolkeypk11.so name=Coolkey", NULL, PR_FALSE);
+        module = SECMOD_LoadUserModule((char*)"library=libcoolkeypk11.so name=Coolkey", NULL, PR_FALSE);
         if (module == NULL) {
             return VCARD_EMUL_FAIL;
         }
