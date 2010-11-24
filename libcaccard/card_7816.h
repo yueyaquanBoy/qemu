@@ -1,0 +1,73 @@
+/*
+ * Implement the 7816 portion of the card spec
+ *
+ */
+#ifndef CARD_7816_H
+#define CARD_7816_H  1
+
+#include "card_7816t.h"
+#include "vcardt.h"
+
+/*
+ * constructors for VCardResponse's
+ */
+/* response from a return buffer and a status */
+VCardResponse *vcard_response_new(VCard *card, unsigned char *buf, int len,
+                                  int Le, VCard7816Status status);
+/* response from a return buffer and status bytes */
+VCardResponse *vcard_response_new_bytes(VCard *card, unsigned char *buf, int len, int Le,
+                                        unsigned char sw1, unsigned char sw2);
+/* response from just status bytes */
+VCardResponse *vcard_response_new_status_bytes(unsigned char sw1, unsigned char sw2);
+/* response from just status: NOTE this cannot fail, it will alwyas return a valid
+ * response, if it can't allocate memory, the response will be
+ * VCARD7816_STATUS_EXC_ERROR_MEMORY_FAILURE */
+VCardResponse *vcard_make_response(VCard7816Status status);
+
+/* create a raw response (status has already been encoded */
+VCardResponse *vcard_response_new_data(unsigned char *buf, int len);
+
+
+
+
+/*
+ * destructor for VCardResponse.
+ *  Can be called with a NULL response
+ */
+void vcard_response_delete(VCardResponse *response);
+
+/*
+ * constructor for VCardAPDU
+ */
+VCardAPDU *vcard_apdu_new(unsigned char *raw_apdu, int len, unsigned short *status);
+
+/*
+ * destructor for VCardAPDU
+ *  Can be called with a NULL apdu
+ */
+void vcard_apdu_delete(VCardAPDU *apdu);
+
+/*
+ * Constructor for a VCardApplet
+ */
+VCardApplet *vcard_new_applet(VCardProcessAPDU applet_process_function,
+                              VCardResetApplet applet_reset_function,
+                              unsigned char *aid, int aid_len);
+
+/*
+ * destructor for a VCardApplet
+ *  Can be called with a NULL applet
+ */
+void vcard_delete_applet(VCardApplet *applet);
+
+
+/* add an applet to the current card */
+VCardStatus vcard_add_applet(VCard *card, VCardApplet *applet);
+
+/*
+ * APDU processing starts here. This routes the card processing stuff to the
+ * right location. Always returns a valid response.
+ */
+VCardStatus vcard_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response);
+
+#endif
