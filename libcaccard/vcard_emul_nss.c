@@ -441,7 +441,8 @@ vcard_emul_get_atr(VCard *card, unsigned char *atr, int *atr_len)
  */
 static VCard *
 vcard_emul_make_card(VReader *reader,
-                    unsigned char * const *certs, int *cert_len, VCardKey *keys[], int cert_count)
+                     unsigned char * const *certs, int *cert_len,
+                     VCardKey *keys[], int cert_count)
 {
     VCardEmul *vcard_emul;
     VCard *vcard;
@@ -507,7 +508,8 @@ vcard_emul_mirror_card(VReader *vreader)
 
     /* count the certs */
     cert_count=0;
-    for (thisObj = firstObj; thisObj; thisObj = PK11_GetNextGenericObject(thisObj)) {
+    for (thisObj = firstObj; thisObj;
+                             thisObj = PK11_GetNextGenericObject(thisObj)) {
         cert_count++;
     }
 
@@ -524,18 +526,21 @@ vcard_emul_mirror_card(VReader *vreader)
 
     /* fill in the arrays */
     cert_count = 0;
-    for (thisObj = firstObj; thisObj; thisObj = PK11_GetNextGenericObject(thisObj)) {
+    for (thisObj = firstObj; thisObj;
+                             thisObj = PK11_GetNextGenericObject(thisObj)) {
         SECItem derCert;
         CERTCertificate *cert;
         SECStatus rv;
 
-        rv = PK11_ReadRawAttribute(PK11_TypeGeneric, thisObj, CKA_VALUE, &derCert);
+        rv = PK11_ReadRawAttribute(PK11_TypeGeneric, thisObj,
+                                   CKA_VALUE, &derCert);
         if (rv != SECSuccess) {
             continue;
         }
-        /* create floating temp cert. This gives us a cert structure even if the token isn't
-         * logged in */
-        cert = CERT_NewTempCertificate(CERT_GetDefaultCertDB(), &derCert, NULL, PR_FALSE, PR_TRUE);
+        /* create floating temp cert. This gives us a cert structure even if
+         * the token isn't logged in */
+        cert = CERT_NewTempCertificate(CERT_GetDefaultCertDB(), &derCert,
+                                       NULL, PR_FALSE, PR_TRUE);
         SECITEM_FreeItem(&derCert, PR_FALSE);
         if (cert == NULL) {
             continue;
@@ -556,7 +561,8 @@ static VCardEmulType default_card_type = VCARD_EMUL_NONE;
 static const char *default_type_params = "";
 
 /*
- * This thread looks for card and reader insertions and puts events on the event queue
+ * This thread looks for card and reader insertions and puts events on the
+ * event queue
  */
 static void
 vcard_emul_event_thread(void *arg)
@@ -575,8 +581,10 @@ vcard_emul_event_thread(void *arg)
         vreader = vcard_emul_find_vreader_from_slot(slot);
         if (vreader == NULL) {
             /* new vreader */
-            vreader_emul = vreader_emul_new(slot, default_card_type, default_type_params);
-            vreader = vreader_new(PK11_GetSlotName(slot), vreader_emul, vreader_emul_delete);
+            vreader_emul = vreader_emul_new(slot, default_card_type,
+                                            default_type_params);
+            vreader = vreader_new(PK11_GetSlotName(slot), vreader_emul,
+                                  vreader_emul_delete);
             PK11_FreeSlot(slot);
             slot = NULL;
             vreader_add_reader(vreader);
@@ -626,13 +634,15 @@ vcard_emul_init_series(VReader *vreader, VCard *vcard)
 }
 
 /*
- * each module has a separate wait call, create a thread for each module that we are using.
+ * each module has a separate wait call, create a thread for each module that
+ * we are using.
  */
 static void
 vcard_emul_new_event_thread(SECMODModule *module)
 {
      PR_CreateThread(PR_SYSTEM_THREAD, vcard_emul_event_thread,
-                          module, PR_PRIORITY_HIGH, PR_GLOBAL_THREAD, PR_UNJOINABLE_THREAD, 0);
+                     module, PR_PRIORITY_HIGH, PR_GLOBAL_THREAD,
+                     PR_UNJOINABLE_THREAD, 0);
 }
 
 static const VCardEmulOptions default_options = {
@@ -646,9 +656,10 @@ static const VCardEmulOptions default_options = {
 
 
 /*
- *  NSS needs the app to supply a password prompt. In our case the only time the password is
- *  supplied is as part of the Login APDU. The actual password is passed in the pw_arg in that
- *  case. In all other cases pw_arg should be NULL.
+ *  NSS needs the app to supply a password prompt. In our case the only time
+ *  the password is supplied is as part of the Login APDU. The actual password
+ *  is passed in the pw_arg in that case. In all other cases pw_arg should be
+ *  NULL.
  */
 static char *
 vcard_emul_get_password(PK11SlotInfo *slot, PRBool retries, void *pw_arg)
@@ -744,7 +755,8 @@ vcard_emul_init(const VCardEmulOptions *options)
     /* Set password callback function */
     PK11_SetPasswordFunc(vcard_emul_get_password);
 
-    /* set up soft cards emulated by software certs rather than physical cards */
+    /* set up soft cards emulated by software certs rather than physical cards
+     * */
     for (i = 0; i < options->vreader_count; i++) {
         int j;
         int cert_count;
@@ -757,21 +769,25 @@ vcard_emul_init(const VCardEmulOptions *options)
         if (slot == NULL) {
             continue;
         }
-        vreader_emul = vreader_emul_new(slot, options->vreader[i].card_type, 
+        vreader_emul = vreader_emul_new(slot, options->vreader[i].card_type,
                                         options->vreader[i].type_params);
-        vreader = vreader_new(options->vreader[i].vname, vreader_emul, vreader_emul_delete);
+        vreader = vreader_new(options->vreader[i].vname, vreader_emul,
+                              vreader_emul_delete);
         vreader_add_reader(vreader);
         cert_count = options->vreader[i].cert_count;
 
-        ret = vcard_emul_alloc_arrays(&certs, &cert_len, &keys, options->vreader[i].cert_count);
+        ret = vcard_emul_alloc_arrays(&certs, &cert_len, &keys,
+                                      options->vreader[i].cert_count);
         if (ret == PR_FALSE) {
             continue;
         }
         cert_count = 0;
         for (j=0; j < options->vreader[i].cert_count; j++) {
-            /* we should have a better way of identifying certs than by nickname here */
-            CERTCertificate *cert = PK11_FindCertFromNickname(options->vreader[i].cert_name[j],
-                                                              NULL);
+            /* we should have a better way of identifying certs than by
+             * nickname here */
+            CERTCertificate *cert = PK11_FindCertFromNickname(
+                                        options->vreader[i].cert_name[j],
+                                        NULL);
             if (cert == NULL) {
                 continue;
             }
@@ -783,7 +799,8 @@ vcard_emul_init(const VCardEmulOptions *options)
             cert_count++;
         }
         if (cert_count) {
-            VCard *vcard = vcard_emul_make_card(vreader, certs, cert_len, keys, cert_count);
+            VCard *vcard = vcard_emul_make_card(vreader, certs, cert_len,
+                                                keys, cert_count);
             vreader_insert_card(vreader, vcard);
             vcard_emul_init_series(vreader, vcard);
             /* allow insertion and removal of soft cards */
@@ -816,11 +833,14 @@ vcard_emul_init(const VCardEmulOptions *options)
 
     if (need_module) {
         SECMODModule *module;
-        module = SECMOD_LoadUserModule((char*)"library=libcoolkeypk11.so name=Coolkey", NULL, PR_FALSE);
+        module = SECMOD_LoadUserModule(
+                    (char*)"library=libcoolkeypk11.so name=Coolkey",
+                    NULL, PR_FALSE);
         if (module == NULL) {
             return VCARD_EMUL_FAIL;
         }
-        SECMOD_DestroyModule(module); /* free our reference, Module will still be on the list.
+        SECMOD_DestroyModule(module); /* free our reference, Module will still
+                                       * be on the list.
                                        * until we destroy it */
     }
 
@@ -846,8 +866,10 @@ vcard_emul_init(const VCardEmulOptions *options)
             if (slot == NULL || !PK11_IsRemovable(slot) || !PK11_IsHW(slot)) {
                 continue;
             }
-            vreader_emul = vreader_emul_new(slot, options->hw_card_type, options->hw_type_params);
-            vreader = vreader_new(PK11_GetSlotName(slot), vreader_emul, vreader_emul_delete);
+            vreader_emul = vreader_emul_new(slot, options->hw_card_type,
+                                            options->hw_type_params);
+            vreader = vreader_new(PK11_GetSlotName(slot), vreader_emul,
+                                  vreader_emul_delete);
             vreader_add_reader(vreader);
 
             has_readers = PR_TRUE;
@@ -919,7 +941,8 @@ static const char *
 strip(const char *str)
 {
     for(;*str; str++) {
-        if ((*str != ' ') && (*str != '\n') && (*str != '\t') && (*str != '\r')) {
+        if ((*str != ' ') && (*str != '\n') &&
+           (*str != '\t') && (*str != '\r')) {
             break;
         }
     }
@@ -930,7 +953,8 @@ static const char *
 find_blank(const char *str)
 {
     for(;*str; str++) {
-        if ((*str == ' ') || (*str == '\n') || (*str == '\t') || (*str == '\r')) {
+        if ((*str == ' ') || (*str == '\n') ||
+           (*str == '\t') || (*str == '\r')) {
             break;
         }
     }
@@ -939,8 +963,8 @@ find_blank(const char *str)
 
 
 /*
- *  We really want to use some existing argument parsing library here. That would give
- *  us a consistant look */
+ *  We really want to use some existing argument parsing library here. That
+ *  would give us a consistant look */
 static VCardEmulOptions options;
 #define READER_STEP 4
 
@@ -1027,7 +1051,8 @@ vcard_emul_options(const char *args)
 
             if (opts->vreader_count >= reader_count) {
                 reader_count += READER_STEP;
-                vreaderOpt = realloc(opts->vreader, reader_count*sizeof(*vreaderOpt));
+                vreaderOpt = realloc(opts->vreader,
+                                reader_count*sizeof(*vreaderOpt));
                 if (vreaderOpt == NULL) {
                     return opts; /* we're done */
                 }

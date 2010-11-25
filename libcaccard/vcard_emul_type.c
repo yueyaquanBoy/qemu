@@ -1,7 +1,8 @@
 /*
- *  This file contains utility functions which abstract the different card types.
- *  The goal is that new card types can easily be added by simply changing this file and
- *  vcard_emul_type.h. It is currently not a requirement to dynamically add new card types.
+ *  This file contains utility functions which abstract the different card
+ *  types.  The goal is that new card types can easily be added by simply
+ *  changing this file and vcard_emul_type.h. It is currently not a requirement
+ *  to dynamically add new card types.
  */
 
 #include <strings.h>

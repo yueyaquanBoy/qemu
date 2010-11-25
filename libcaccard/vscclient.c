@@ -76,7 +76,8 @@ SendMsg (
     MUTEX_LOCK(write_lock);
 
     if (verbose > 10) {
-        printf("sending type=%d id=%d, len =%d (0x%x)\n", type, reader_id, length, length);
+        printf("sending type=%d id=%d, len =%d (0x%x)\n",
+               type, reader_id, length, length);
     }
 
     mhHeader.type = type;
@@ -133,18 +134,21 @@ event_thread(void *arg)
             break;
         }
         reader_id = vreader_get_id(event->reader);
-        if (reader_id == VSCARD_UNDEFINED_READER_ID && event->type != VEVENT_READER_INSERT) {
+        if (reader_id == VSCARD_UNDEFINED_READER_ID &&
+            event->type != VEVENT_READER_INSERT) {
             /* ignore events from readers qemu has rejected */
-            /* if qemu is still deciding on this reader, wait to see if need to forward this
-             * event */
+            /* if qemu is still deciding on this reader, wait to see if need to
+             * forward this event */
             MUTEX_LOCK(pending_reader_lock);
             if (!pending_reader || (pending_reader != event->reader)) {
-                /* wasn't for a pending reader, this reader has already been rejected by qemu */
+                /* wasn't for a pending reader, this reader has already been
+                 * rejected by qemu */
                 MUTEX_UNLOCK(pending_reader_lock);
                 vevent_delete(event);
                 continue;
             }
-            /* this reader hasn't been told it's status from qemu yet, wait for that status */
+            /* this reader hasn't been told it's status from qemu yet, wait for
+             * that status */
             while (pending_reader != NULL) {
                 CONDITION_WAIT(pending_reader_condition,pending_reader_lock);
             }
@@ -162,7 +166,8 @@ event_thread(void *arg)
         case VEVENT_READER_INSERT:
             /* tell qemu to insert a new CCID reader */
             /* wait until qemu has responded to our first reader insert
-             * before we send a second. That way we won't confuse the responses */
+             * before we send a second. That way we won't confuse the responses
+             * */
             MUTEX_LOCK(pending_reader_lock);
             while (pending_reader != NULL) {
                 CONDITION_WAIT(pending_reader_condition,pending_reader_lock);
@@ -195,7 +200,8 @@ event_thread(void *arg)
             );
             break;
         case VEVENT_CARD_INSERT:
-            /* get the ATR (intended as a response to a power on from the reader */
+            /* get the ATR (intended as a response to a power on from the
+             * reader */
             atr_len = MAX_ATR_LEN;
             vreader_power_on(event->reader, atr, &atr_len);
             /* ATR call functions as a Card Insert event */
@@ -257,17 +263,18 @@ do_command(void)
     string = fgets(inbuf, sizeof(inbuf), stdin);
     if (string != NULL) {
         if (strncmp(string,"exit",4) == 0) {
-	    /* remove all the readers */
-	    VReaderList *list = vreader_get_reader_list();
-	    VReaderListEntry *reader_entry;
-	    printf("Active Readers:\n");
-	    for (reader_entry = vreader_list_get_first(list); reader_entry;
-                                reader_entry = vreader_list_get_next(reader_entry)) {
+            /* remove all the readers */
+            VReaderList *list = vreader_get_reader_list();
+            VReaderListEntry *reader_entry;
+            printf("Active Readers:\n");
+            for (reader_entry = vreader_list_get_first(list); reader_entry;
+                 reader_entry = vreader_list_get_next(reader_entry)) {
                 VReader *reader = vreader_list_get_reader(reader_entry);
                 VReaderID reader_id;
                 reader_id=vreader_get_id(reader);
                 if (reader_id == -1) continue;
-                /* be nice and signal card removal first (qemu probably should do this itself) */
+                /* be nice and signal card removal first (qemu probably should
+                 * do this itself) */
                 if (vreader_card_is_present(reader) == VREADER_OK) {
                     SendMsg (
                         VSC_CardRemove,
@@ -302,7 +309,8 @@ do_command(void)
                                                : "invalid reader", error);
         } else if (strncmp(string,"select",6) == 0) {
             if (string[6] == ' ') {
-                reader_id = get_id_from_string(&string[7], VSCARD_UNDEFINED_READER_ID);
+                reader_id = get_id_from_string(&string[7],
+                                               VSCARD_UNDEFINED_READER_ID);
             }
             if (reader_id != VSCARD_UNDEFINED_READER_ID) {
                 reader = vreader_get_reader_by_id(reader_id);
@@ -320,11 +328,11 @@ do_command(void)
             }
             printf ("debug level = %d\n", verbose);
         } else if (strncmp(string,"list",4) == 0) {
-	    VReaderList *list = vreader_get_reader_list();
-	    VReaderListEntry *reader_entry;
-	    printf("Active Readers:\n");
-	    for (reader_entry = vreader_list_get_first(list); reader_entry;
-                                reader_entry = vreader_list_get_next(reader_entry)) {
+            VReaderList *list = vreader_get_reader_list();
+            VReaderListEntry *reader_entry;
+            printf("Active Readers:\n");
+            for (reader_entry = vreader_list_get_first(list); reader_entry;
+                 reader_entry = vreader_list_get_next(reader_entry)) {
                 VReader *reader = vreader_list_get_reader(reader_entry);
                 VReaderID reader_id;
                 reader_id=vreader_get_id(reader);
@@ -478,8 +486,9 @@ main (
     if (!passthru && cert_count > 0) {
         char *new_args;
         int len, i;
-        /* if we've given some -c options, we clearly we want do so some software emulation.
-         * add that emulation now. this is NSS Emulator specific */
+        /* if we've given some -c options, we clearly we want do so some
+         * software emulation.  add that emulation now. this is NSS Emulator
+         * specific */
         if (emul_args == NULL) {
             emul_args = "db=\"/etc/pki/nssdb\"";
         }
@@ -531,7 +540,8 @@ main (
 #endif
         vcard_emul_init(command_line_options);
 
-    /* launch the event_thread. This will trigger reader adds for all the existing readers */
+    /* launch the event_thread. This will trigger reader adds for all the
+     * existing readers */
     rv = pthread_create(&thread_id, NULL, event_thread, reader);
     if (rv < 0) {
         perror("pthread_create");
@@ -626,7 +636,8 @@ if (verbose) {
                     );
                 }
                 vreader_free(reader);
-                reader = NULL; /* we've freed it, don't use it by accident again */
+                reader = NULL; /* we've freed it, don't use it by accident
+                                  again */
                 break;
             case VSC_Reconnect:
                 {
