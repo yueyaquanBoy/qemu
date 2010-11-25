@@ -18,17 +18,13 @@
 
 #include "mutex.h"
 
-
-typedef unsigned char BYTE;
-typedef unsigned long LONG;
-
 int verbose = 0;
 
 int sock;
 
 void
 PrintByteArray (
-    BYTE *arrBytes,
+    uint8_t *arrBytes,
     unsigned int nSize
 ) {
     int i;
@@ -445,8 +441,8 @@ main (
     LONG rv;
     int dwSendLength;
     int dwRecvLength;
-    BYTE pbRecvBuffer[APDUBufSize];
-    BYTE pbSendBuffer[APDUBufSize];
+    uint8_t pbRecvBuffer[APDUBufSize];
+    uint8_t pbSendBuffer[APDUBufSize];
      VReaderStatus reader_status;
     VReader *reader = NULL;
     VCardEmulOptions *command_line_options = NULL;

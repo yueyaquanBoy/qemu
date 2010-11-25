@@ -35,7 +35,7 @@ typedef CONDITION_VARIABLE condition_t;
 #define CONDITION_WAIT(cond,mutex) \
             SleepConditionVariableCS(&cond,&mutex,INFINTE)
 #define CONDITION_NOTIFY(cond) WakeConditionVariable(&cond)
-typedef DWORD thread_t;
+typedef uint32_t thread_t;
 typedef HANDLE thread_status_t;
 #define THREAD_CREATE(tid, func, arg) \
         CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)func, arg, 0, &tid)

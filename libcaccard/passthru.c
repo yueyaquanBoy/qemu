@@ -20,7 +20,7 @@ struct VCardAppletPrivateStruct {
     char *reader_name;
     /* pcsc-lite parameters */
     SCARDHANDLE hCard;
-    DWORD hProtocol;
+    uint32_t hProtocol;
     SCARD_IO_REQUEST *send_io;
     unsigned char atr[MAX_ATR_SIZE];
     int atr_len;
@@ -37,7 +37,7 @@ passthru_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response)
 {
     LONG rv;
     unsigned char buf[MAX_RESPONSE_LENGTH];
-    DWORD len = MAX_RESPONSE_LENGTH;
+    uint32_t len = MAX_RESPONSE_LENGTH;
     VCardAppletPrivate *applet_private = NULL;
     SCARD_IO_REQUEST receive_io;
 
@@ -142,7 +142,7 @@ passthru_get_reader_name(VReader *reader)
     char *reader_list = NULL;
     char *reader_entry = NULL;
     char *reader_match = NULL;
-    DWORD reader_string_length;
+    uint32_t reader_string_length;
     VCardStatus status;
     LONG rv;
 
