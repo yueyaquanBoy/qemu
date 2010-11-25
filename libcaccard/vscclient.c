@@ -272,7 +272,9 @@ do_command(void)
                 VReader *reader = vreader_list_get_reader(reader_entry);
                 VReaderID reader_id;
                 reader_id=vreader_get_id(reader);
-                if (reader_id == -1) continue;
+                if (reader_id == -1) {
+                    continue;
+                }
                 /* be nice and signal card removal first (qemu probably should
                  * do this itself) */
                 if (vreader_card_is_present(reader) == VREADER_OK) {
@@ -336,8 +338,9 @@ do_command(void)
                 VReader *reader = vreader_list_get_reader(reader_entry);
                 VReaderID reader_id;
                 reader_id=vreader_get_id(reader);
-                if (reader_id == -1) continue;
-
+                if (reader_id == -1) {
+                    continue;
+                }
                 printf("%3d %s %s\n",reader_id,
                        vreader_card_is_present(reader) == VREADER_OK ?
                        "CARD_PRESENT": "            ",
@@ -349,7 +352,9 @@ do_command(void)
                 VReader *reader = vreader_list_get_reader(reader_entry);
                 VReaderID reader_id;
                 reader_id=vreader_get_id(reader);
-                if (reader_id != -1) continue;
+                if (reader_id != -1) {
+                    continue;
+                }
 
                 printf("INA %s %s\n",
                        vreader_card_is_present(reader) == VREADER_OK ?
@@ -421,8 +426,9 @@ connect_to_qemu (
         printf ("Could not connect\n");
         return (5);
     }
-if (verbose)
-    printf ("Connected (sizeof Header=%zd)!\n", sizeof (VSCMsgHeader));
+    if (verbose) {
+        printf ("Connected (sizeof Header=%zd)!\n", sizeof (VSCMsgHeader));
+    }
     return sock;
 }
 
@@ -586,10 +592,11 @@ main (
             }
             return (8);
         }
-if (verbose)
-    printf ("Header: type=%d, reader_id=%d length=%d (0x%x)\n",
-            mhHeader.type, mhHeader.reader_id, mhHeader.length,
+        if (verbose) {
+            printf ("Header: type=%d, reader_id=%d length=%d (0x%x)\n",
+                    mhHeader.type, mhHeader.reader_id, mhHeader.length,
                                                mhHeader.length);
+        }
         switch (mhHeader.type) {
             case VSC_APDU:
                 rv = read (
@@ -603,10 +610,10 @@ if (verbose)
                     close (sock);
                     return (8);
                 }
-if (verbose) {
-    printf (" recv APDU: ");
-    PrintByteArray (pbSendBuffer, mhHeader.length);
-}
+                if (verbose) {
+                    printf (" recv APDU: ");
+                    PrintByteArray (pbSendBuffer, mhHeader.length);
+                }
                 /* Transmit recieved APDU */
                 dwSendLength = mhHeader.length;
                 dwRecvLength = sizeof(pbRecvBuffer);
@@ -616,10 +623,10 @@ if (verbose) {
                     pbRecvBuffer, &dwRecvLength);
                 if (reader_status == VREADER_OK) {
                     mhHeader.length = dwRecvLength;
-if (verbose) {
-    printf (" send response: ");
-    PrintByteArray (pbRecvBuffer, mhHeader.length);
-}
+                if (verbose) {
+                    printf (" send response: ");
+                    PrintByteArray (pbRecvBuffer, mhHeader.length);
+                }
                     SendMsg (
                         VSC_APDU,
                         mhHeader.reader_id,
