@@ -519,7 +519,8 @@ vcard_make_response(VCard7816Status status)
         response = vcard_response_new_status(status);
         if (response == NULL) {
             /* couldn't allocate the buffer, return memmory error */
-            return VCARD_RESPONSE_GET_STATIC(VCARD7816_STATUS_EXC_ERROR_MEMORY_FAILURE);
+            return VCARD_RESPONSE_GET_STATIC(
+                        VCARD7816_STATUS_EXC_ERROR_MEMORY_FAILURE);
         }
     }
     ASSERT(response);
@@ -592,12 +593,13 @@ vcard7816_vm_process_apdu(VCard *card, VCardAPDU *apdu,
     case  VCARD7816_INS_ENVELOPE:
     case  VCARD7816_INS_PUT_DATA:
         *response = vcard_make_response(
-                        VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);
+                            VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);
         break;
 
     case  VCARD7816_INS_SELECT_FILE:
         if (apdu->a_p1 != 0x04) {
-            *response = vcard_make_response(VCARD7816_STATUS_ERROR_FUNCTION_NOT_SUPPORTED);
+            *response = vcard_make_response(
+                            VCARD7816_STATUS_ERROR_FUNCTION_NOT_SUPPORTED);
             break;
         }
 
