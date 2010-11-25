@@ -1,10 +1,10 @@
 /*
  * This is the actual card emulator.
  *
- * These functions can be implemented in different ways on different platforms using
- * the underlying system primitives. For Linux it uses NSS, though direct to PKCS #11,
- * openssl+pkcs11, or even gnu crypto libraries+pkcs #11 could be used. On Windows
- * CAPI could be used.
+ * These functions can be implemented in different ways on different platforms
+ * using the underlying system primitives. For Linux it uses NSS, though direct
+ * to PKCS #11, openssl+pkcs11, or even gnu crypto libraries+pkcs #11 could be
+ * used. On Windows CAPI could be used.
  */
 
 #ifndef VCARD_EMUL_H
@@ -29,7 +29,8 @@ typedef struct VCardEmulOptionsStruct VCardEmulOptions;
 /*
  * Login functions
  */
-/* return the number of login attempts still possible on the card. if unknown, return -1 */
+/* return the number of login attempts still possible on the card. if unknown,
+ * return -1 */
 int vcard_emul_get_login_count(VCard *card);
 /* login into the card, return the 7816 status word (sw2 || sw1) */
 VCard7816Status vcard_emul_login(VCard *card, unsigned char *pin, int pin_len);

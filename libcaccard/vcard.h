@@ -9,8 +9,8 @@
 /*
  * response buffer constructors and destructors.
  *
- * response buffers are used when we need to return more data than will fit in a normal APDU
- * response (nominally 254 bytes).
+ * response buffers are used when we need to return more data than will fit in
+ * a normal APDU response (nominally 254 bytes).
  */
 VCardBufferResponse *vcard_buffer_response_new(unsigned char *buffer, int size);
 void vcard_buffer_response_delete(VCardBufferResponse *buffer_response);

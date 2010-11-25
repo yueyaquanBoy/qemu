@@ -24,13 +24,13 @@ struct VCardResponseStruct {
 
 #define VCARD_RESPONSE_NEW_STATIC_STATUS(stat) \
 static const VCardResponse VCardResponse##stat = \
-        {(unsigned char *)&VCardResponse##stat.b_sw1, (stat), ((stat) >> 8), ((stat) & 0xff), \
-         0, 2, VCARD_STATIC};
+        {(unsigned char *)&VCardResponse##stat.b_sw1, (stat), ((stat) >> 8), \
+         ((stat) & 0xff), 0, 2, VCARD_STATIC};
 
 #define VCARD_RESPONSE_NEW_STATIC_STATUS_BYTES(sw1, sw2) \
 static const VCardResponse VCARDResponse##sw1 = \
-        {(unsigned char *)&VCardResponse##name.b_sw1, ((sw1) << 8 | (sw2)), (sw1), (sw2), \
-         0, 2, VCARD_STATIC};
+        {(unsigned char *)&VCardResponse##name.b_sw1, ((sw1) << 8 | (sw2)), \
+         (sw1), (sw2), 0, 2, VCARD_STATIC};
 
 /* cast away the const, callers need may need to 'free' the
  * result, and const implies that they don't */
@@ -66,13 +66,13 @@ struct VCardAPDUHeader {
  */
 struct VCardAPDUStruct {
     int a_len;                /* length of the whole buffer, including header */
-    int a_Lc;                /* 7816 Lc (parameter length) value */
-    int a_Le;                /* 7816 Le (expected result length) value */
-    unsigned char *a_body;        /* pointer to the parameter */
-    int a_channel;         /* decoded channel */
-    int a_secure_messaging; /* decoded secure messaging type */
-    int a_type;                /* decoded type from cla (top nibble of class) */
-    VCardAPDUType a_gen_type;        /* generic type (7816, PROPRIETARY, RFU, etc) */
+    int a_Lc;                 /* 7816 Lc (parameter length) value */
+    int a_Le;                 /* 7816 Le (expected result length) value */
+    unsigned char *a_body;    /* pointer to the parameter */
+    int a_channel;            /* decoded channel */
+    int a_secure_messaging;   /* decoded secure messaging type */
+    int a_type;               /* decoded type from cla (top nibble of class) */
+    VCardAPDUType a_gen_type; /* generic type (7816, PROPRIETARY, RFU, etc) */
     union {
         struct VCardAPDUHeader *header;
         unsigned char   *data;

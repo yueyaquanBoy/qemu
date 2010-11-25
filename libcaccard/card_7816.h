@@ -15,12 +15,14 @@
 VCardResponse *vcard_response_new(VCard *card, unsigned char *buf, int len,
                                   int Le, VCard7816Status status);
 /* response from a return buffer and status bytes */
-VCardResponse *vcard_response_new_bytes(VCard *card, unsigned char *buf, int len, int Le,
+VCardResponse *vcard_response_new_bytes(VCard *card, unsigned char *buf,
+                                        int len, int Le,
                                         unsigned char sw1, unsigned char sw2);
 /* response from just status bytes */
-VCardResponse *vcard_response_new_status_bytes(unsigned char sw1, unsigned char sw2);
-/* response from just status: NOTE this cannot fail, it will alwyas return a valid
- * response, if it can't allocate memory, the response will be
+VCardResponse *vcard_response_new_status_bytes(unsigned char sw1,
+                                               unsigned char sw2);
+/* response from just status: NOTE this cannot fail, it will alwyas return a
+ * valid response, if it can't allocate memory, the response will be
  * VCARD7816_STATUS_EXC_ERROR_MEMORY_FAILURE */
 VCardResponse *vcard_make_response(VCard7816Status status);
 
@@ -39,7 +41,8 @@ void vcard_response_delete(VCardResponse *response);
 /*
  * constructor for VCardAPDU
  */
-VCardAPDU *vcard_apdu_new(unsigned char *raw_apdu, int len, unsigned short *status);
+VCardAPDU *vcard_apdu_new(unsigned char *raw_apdu, int len,
+                          unsigned short *status);
 
 /*
  * destructor for VCardAPDU
@@ -51,6 +54,7 @@ void vcard_apdu_delete(VCardAPDU *apdu);
  * APDU processing starts here. This routes the card processing stuff to the
  * right location. Always returns a valid response.
  */
-VCardStatus vcard_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response);
+VCardStatus vcard_process_apdu(VCard *card, VCardAPDU *apdu,
+                               VCardResponse **response);
 
 #endif

@@ -17,8 +17,9 @@
 */
 
 /*
- *  This header file provides a way of mapping windows and linux thread calls to a set of macros.
- *  Ideally this would be shared by whatever subsystem we link with.
+ *  This header file provides a way of mapping windows and linux thread calls
+ *  to a set of macros.  Ideally this would be shared by whatever subsystem we
+ *  link with.
  */
 
 #ifndef _H_MUTEX
@@ -31,7 +32,8 @@ typedef CRITICAL_SECTION mutex_t;
 #define MUTEX_UNLOCK(mutex) LeaveCriticalSection(&mutex)
 typedef CONDITION_VARIABLE condition_t;
 #define CONDITION_INIT(cond) InitializeConditionVariable(&cond)
-#define CONDITION_WAIT(cond,mutex) SleepConditionVariableCS(&cond,&mutex,INFINTE)
+#define CONDITION_WAIT(cond,mutex) \
+            SleepConditionVariableCS(&cond,&mutex,INFINTE)
 #define CONDITION_NOTIFY(cond) WakeConditionVariable(&cond)
 typedef DWORD thread_t;
 typedef HANDLE thread_status_t;
