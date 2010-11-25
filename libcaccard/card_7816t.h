@@ -5,11 +5,11 @@
 #ifndef CARD_7816T_H
 #define CARD_7816T_H 1
 
-typedef unsigned short VCard7816Status;
+typedef unsigned short vcard_7816_status_t;
 
 struct VCardResponseStruct {
     unsigned char *b_data;
-    VCard7816Status b_status;
+    vcard_7816_status_t b_status;
     unsigned char b_sw1;
     unsigned char b_sw2;
     int b_len;

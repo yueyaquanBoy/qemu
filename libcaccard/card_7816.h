@@ -13,7 +13,7 @@
  */
 /* response from a return buffer and a status */
 VCardResponse *vcard_response_new(VCard *card, unsigned char *buf, int len,
-                                  int Le, VCard7816Status status);
+                                  int Le, vcard_7816_status_t status);
 /* response from a return buffer and status bytes */
 VCardResponse *vcard_response_new_bytes(VCard *card, unsigned char *buf,
                                         int len, int Le,
@@ -24,7 +24,7 @@ VCardResponse *vcard_response_new_status_bytes(unsigned char sw1,
 /* response from just status: NOTE this cannot fail, it will alwyas return a
  * valid response, if it can't allocate memory, the response will be
  * VCARD7816_STATUS_EXC_ERROR_MEMORY_FAILURE */
-VCardResponse *vcard_make_response(VCard7816Status status);
+VCardResponse *vcard_make_response(vcard_7816_status_t status);
 
 /* create a raw response (status has already been encoded */
 VCardResponse *vcard_response_new_data(unsigned char *buf, int len);

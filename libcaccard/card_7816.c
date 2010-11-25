@@ -13,7 +13,7 @@
  * set the status bytes based on the status word
  */
 static void
-vcard_response_set_status(VCardResponse *response, VCard7816Status status)
+vcard_response_set_status(VCardResponse *response, vcard_7816_status_t status)
 {
     unsigned char sw1, sw2;
     response->b_status = status; /* make sure the status and swX representations
@@ -94,7 +94,7 @@ vcard_init_buffer_response(VCard *card, unsigned char *buf, int len)
  */
 VCardResponse *
 vcard_response_new(VCard *card, unsigned char *buf,
-                   int len, int Le, VCard7816Status status)
+                   int len, int Le, vcard_7816_status_t status)
 {
     VCardResponse *new_response;
 
@@ -133,7 +133,7 @@ vcard_response_new_bytes(VCard *card, unsigned char *buf, int len, int Le,
  * get a new Reponse buffer that only has a status.
  */
 static VCardResponse *
-vcard_response_new_status(VCard7816Status status)
+vcard_response_new_status(vcard_7816_status_t status)
 {
     VCardResponse *new_response;
 
@@ -207,7 +207,7 @@ vcard_response_delete(VCardResponse *response)
  * decode the class bit and set our generic type field, channel, and
  * secure messaging values.
  */
-static VCard7816Status
+static vcard_7816_status_t
 vcard_apdu_set_class(VCardAPDU *apdu) {
     apdu->a_channel = 0;
     apdu->a_secure_messaging = 0;
@@ -253,7 +253,7 @@ vcard_apdu_set_class(VCardAPDU *apdu) {
  * set the Le and Lc fiels according to table 5 of the
  * 7816-4 part 4 spec
  */
-static VCard7816Status
+static vcard_7816_status_t
 vcard_apdu_set_length(VCardAPDU *apdu)
 {
     int L, Le;
@@ -337,7 +337,7 @@ vcard_apdu_set_length(VCardAPDU *apdu)
  * values.
  */
 VCardAPDU *
-vcard_apdu_new(unsigned char *raw_apdu, int len, VCard7816Status *status)
+vcard_apdu_new(unsigned char *raw_apdu, int len, vcard_7816_status_t *status)
 {
     VCardAPDU *new_apdu;
 
@@ -431,7 +431,7 @@ VCARD_RESPONSE_NEW_STATIC_STATUS(VCARD7816_STATUS_ERROR_GENERAL)
  * return a response.
  */
 VCardResponse *
-vcard_make_response(VCard7816Status status)
+vcard_make_response(vcard_7816_status_t status)
 {
     VCardResponse *response = NULL;
 
@@ -551,7 +551,7 @@ vcard7816_vm_process_apdu(VCard *card, VCardAPDU *apdu,
     int bytes_to_copy, next_byte_count, count;
     VCardApplet *current_applet;
     VCardBufferResponse *buffer_response;
-    VCard7816Status status;
+    vcard_7816_status_t status;
 
     /* parse the class first */
     if (apdu->a_gen_type !=  VCARD_7816_ISO) {

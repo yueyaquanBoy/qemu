@@ -110,7 +110,7 @@ cac_applet_pki_process_apdu(VCard *card, VCardAPDU *apdu,
     VCardAppletPrivate *applet_private = NULL;
     int size, next;
     unsigned char *sign_buffer;
-    VCard7816Status status;
+    vcard_7816_status_t status;
 
     applet_private = vcard_get_current_applet_private(card, apdu->a_channel);
     ASSERT(applet_private);
