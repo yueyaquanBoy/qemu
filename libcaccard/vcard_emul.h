@@ -33,7 +33,8 @@ typedef struct VCardEmulOptionsStruct VCardEmulOptions;
  * return -1 */
 int vcard_emul_get_login_count(VCard *card);
 /* login into the card, return the 7816 status word (sw2 || sw1) */
-vcard_7816_status_t vcard_emul_login(VCard *card, unsigned char *pin, int pin_len);
+vcard_7816_status_t vcard_emul_login(VCard *card, unsigned char *pin,
+                                     int pin_len);
 
 /*
  * key functions

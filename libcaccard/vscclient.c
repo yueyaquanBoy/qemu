@@ -36,7 +36,8 @@ PrintByteArray (
 
 void
 PrintUsage () {
-    printf ("vscclient [-c <certname> .. -e <emul_args> -d <level>%s] <host> <port> \n",
+    printf ("vscclient [-c <certname> .. -e <emul_args> -d <level>%s] "
+            "<host> <port> \n",
 #ifdef USE_PASSTHRU
     " -p");
     printf (" -p use passthrough mode\n");
@@ -495,7 +496,8 @@ main (
             emul_args = "db=\"/etc/pki/nssdb\"";
         }
 #define SOFT_STRING ",soft=(,Virtual Reader,CAC,,"
-        len = strlen(emul_args) + strlen(SOFT_STRING) + 2; /* 2 == close paren & null */
+             /* 2 == close paren & null */
+        len = strlen(emul_args) + strlen(SOFT_STRING) + 2;
         for (i=0; i < cert_count; i++) {
             len +=strlen(cert_names[i])+1; /* 1 == comma */
         }
@@ -657,7 +659,8 @@ main (
                         qemu_ip = ip_numeric_to_char(reconnect.ip);
                         qemu_port = reconnect.port;
                     } else {
-                        printf("info: reconnect with no target ip:port: bumping port by one and reconnecting\n");
+                        printf("info: reconnect with no target ip:port: "
+                               "bumping port by one and reconnecting\n");
                         qemu_port = qemu_port + 1;
                     }
                     /* sent when qemu is migrating, we need to close the socket

@@ -985,7 +985,8 @@ vcard_emul_options(const char *args)
         if (*args == ',') {
            continue;
         }
-        /* soft=(slot_name,virt_name,emul_type,emul_flags,cert_1,cert_2,cert_3...) */
+        /* soft=(slot_name,virt_name,emul_type,emul_flags,cert_1, (no eol)
+         *       cert_2,cert_3...) */
         if (strncmp(args,"soft=",5) == 0) {
             const char *name;
             const char *vname;
@@ -1119,27 +1120,28 @@ vcard_emul_options(const char *args)
 void
 vcard_emul_usage(void)
 {
-   fprintf(stderr, "emul args: comma separated list of the following arguments\n");
-   fprintf(stderr, " db={nss_database}               (default sql:/etc/pki/nssdb)\n");
-   fprintf(stderr, " use_hw=[yes|no]                 (default yes)\n");
-   fprintf(stderr, " hw_type={card_type_to_emulate}  (default CAC)\n");
-   fprintf(stderr, " hw_param={param_for_card}       (default \"\")\n");
-   fprintf(stderr, " soft=({slot_name},{vreader_name},{card_type_to_emulate},{params_for_card},\n"
-                   "       {cert1},{cert2},{cert3}    (default none)\n");
-   fprintf(stderr, "\n");
-   fprintf(stderr, "  {nss_database}          The location of the NSS cert & key database\n");
-   fprintf(stderr, "  {card_type_to_emulate}  What card interface to present to the guest\n");
-   fprintf(stderr, "  {param_for_card}        Card interface specific parameters\n");
-   fprintf(stderr, "  {slot_name}             NSS slot that contains the certs\n");
-   fprintf(stderr, "  {vreader_name}          Virutal reader name to present to the guest\n");
-   fprintf(stderr, "  {certN}                 Nickname of the certificate n on the virtual card\n");
-   fprintf(stderr, "\n");
-   fprintf(stderr, "These parameters come as a single string separated by blanks or newlines.");
-   fprintf(stderr, "\n");
-   fprintf(stderr, "Unless use_hw is set to no, all tokens that look like removable hardware\n"
-                   "tokens will be presented to the guest using the emulator specified by \n"
-                   "hw_type, and parameters of hw_param.\n");
-   fprintf(stderr, "\n");
-   fprintf(stderr, "If more one or more soft= parameters are specified, these readers will be\n"
-                   "presented to the guest\n");
+   fprintf(stderr,
+"emul args: comma separated list of the following arguments\n"
+" db={nss_database}               (default sql:/etc/pki/nssdb)\n"
+" use_hw=[yes|no]                 (default yes)\n"
+" hw_type={card_type_to_emulate}  (default CAC)\n"
+" hw_param={param_for_card}       (default \"\")\n"
+" soft=({slot_name},{vreader_name},{card_type_to_emulate},{params_for_card},\n"
+"       {cert1},{cert2},{cert3}    (default none)\n"
+"\n"
+"  {nss_database}          The location of the NSS cert & key database\n"
+"  {card_type_to_emulate}  What card interface to present to the guest\n"
+"  {param_for_card}        Card interface specific parameters\n"
+"  {slot_name}             NSS slot that contains the certs\n"
+"  {vreader_name}          Virutal reader name to present to the guest\n"
+"  {certN}                 Nickname of the certificate n on the virtual card\n"
+"\n"
+"These parameters come as a single string separated by blanks or newlines."
+"\n"
+"Unless use_hw is set to no, all tokens that look like removable hardware\n"
+"tokens will be presented to the guest using the emulator specified by \n"
+"hw_type, and parameters of hw_param.\n"
+"\n"
+"If more one or more soft= parameters are specified, these readers will be\n"
+"presented to the guest\n");
 }
