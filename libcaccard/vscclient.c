@@ -22,8 +22,8 @@ int verbose = 0;
 
 int sock;
 
-void
-PrintByteArray (
+static void
+print_byte_array (
     uint8_t *arrBytes,
     unsigned int nSize
 ) {
@@ -34,8 +34,8 @@ PrintByteArray (
     printf ("\n");
 }
 
-void
-PrintUsage () {
+static void
+print_usage (void) {
     printf ("vscclient [-c <certname> .. -e <emul_args> -d <level>%s] "
             "<host> <port> \n",
 #ifdef USE_PASSTHRU
@@ -47,7 +47,7 @@ PrintUsage () {
     vcard_emul_usage();
 }
 
-char*
+static char*
 ip_numeric_to_char(
     uint32_t ip
 ) {
@@ -60,14 +60,14 @@ ip_numeric_to_char(
 
 static mutex_t write_lock;
 
-int
-SendMsg (
+static int
+send_msg (
     VSCMsgType type,
     uint32_t reader_id,
     const void *msg,
     unsigned int length
 ) {
-    LONG rv;
+    int rv;
     VSCMsgHeader mhHeader;
 
     MUTEX_LOCK(write_lock);
@@ -175,7 +175,7 @@ event_thread(void *arg)
             if (verbose > 10) {
                 printf (" READER INSERT: %s\n", reader_name);
             }
-            SendMsg (
+            send_msg (
                 VSC_ReaderAdd,
                 reader_id, /* currerntly VSCARD_UNDEFINED_READER_ID */
                 NULL, 0
@@ -189,7 +189,7 @@ event_thread(void *arg)
             if (verbose > 10) {
                 printf (" READER REMOVE: %d \n", reader_id);
             }
-            SendMsg(
+            send_msg(
                 VSC_ReaderRemove,
                 reader_id,
                 NULL,
@@ -204,9 +204,9 @@ event_thread(void *arg)
             /* ATR call functions as a Card Insert event */
             if (verbose > 10) {
                 printf (" CARD INSERT %d: ", reader_id);
-                PrintByteArray (atr, atr_len);
+                print_byte_array (atr, atr_len);
             }
-            SendMsg (
+            send_msg (
                 VSC_ATR,
                 reader_id,
                 atr,
@@ -218,7 +218,7 @@ event_thread(void *arg)
             if (verbose > 10) {
                 printf (" CARD REMOVE %d: \n", reader_id);
             }
-            SendMsg (
+            send_msg (
                 VSC_CardRemove,
                 reader_id,
                 NULL,
@@ -234,7 +234,7 @@ event_thread(void *arg)
 }
 
 
-unsigned int
+static unsigned int
 get_id_from_string(char *string, unsigned int default_id)
 {
     unsigned int id = atoi(string);
@@ -246,7 +246,7 @@ get_id_from_string(char *string, unsigned int default_id)
     return id;
 }
 
-void
+static void
 do_command(void)
 {
     char inbuf[255];
@@ -275,14 +275,14 @@ do_command(void)
                 /* be nice and signal card removal first (qemu probably should
                  * do this itself) */
                 if (vreader_card_is_present(reader) == VREADER_OK) {
-                    SendMsg (
+                    send_msg (
                         VSC_CardRemove,
                         reader_id,
                         NULL,
                         0
                     );
                 }
-                SendMsg (
+                send_msg (
                     VSC_ReaderRemove,
                     reader_id,
                     NULL,
@@ -379,7 +379,7 @@ do_command(void)
 // just for ease of parsing command line arguments.
 #define MAX_CERTS 100
 
-int
+static int
 connect_to_qemu (
     const char *ip,
     uint32_t port
@@ -439,7 +439,7 @@ main (
     VSCMsgHeader mhHeader;
     VSCMsgError *error_msg;
 
-    LONG rv;
+    int rv;
     int dwSendLength;
     int dwRecvLength;
     uint8_t pbRecvBuffer[APDUBufSize];
@@ -471,7 +471,7 @@ main (
 #ifdef USE_PASSTHRU
                 passthru = 1;
 #else
-                PrintUsage();
+                print_usage();
                 exit(4);
 #endif
                 break;
@@ -482,7 +482,7 @@ main (
     }
 
     if (argc - optind != 2) {
-        PrintUsage();
+        print_usage();
         exit (4);
     }
 
@@ -493,7 +493,7 @@ main (
          * software emulation.  add that emulation now. this is NSS Emulator
          * specific */
         if (emul_args == NULL) {
-            emul_args = "db=\"/etc/pki/nssdb\"";
+            emul_args = (char*)"db=\"/etc/pki/nssdb\"";
         }
 #define SOFT_STRING ",soft=(,Virtual Reader,CAC,,"
              /* 2 == close paren & null */
@@ -526,7 +526,7 @@ main (
 
     /* remove whatever reader might be left in qemu,
      * in case of a unclean previous exit. */
-    SendMsg(
+    send_msg(
         VSC_ReaderRemove,
         VSCARD_MINIMAL_READER_ID,
         NULL,
@@ -586,7 +586,7 @@ main (
             if (rv < 0) {
                 perror("header read error\n");
             } else {
-                printf ("header short read %ld\n", rv);
+                printf ("header short read %d\n", rv);
             }
             return (8);
         }
@@ -610,7 +610,7 @@ main (
                 }
                 if (verbose) {
                     printf (" recv APDU: ");
-                    PrintByteArray (pbSendBuffer, mhHeader.length);
+                    print_byte_array (pbSendBuffer, mhHeader.length);
                 }
                 /* Transmit recieved APDU */
                 dwSendLength = mhHeader.length;
@@ -623,9 +623,9 @@ main (
                     mhHeader.length = dwRecvLength;
                 if (verbose) {
                     printf (" send response: ");
-                    PrintByteArray (pbRecvBuffer, mhHeader.length);
+                    print_byte_array (pbRecvBuffer, mhHeader.length);
                 }
-                    SendMsg (
+                    send_msg (
                         VSC_APDU,
                         mhHeader.reader_id,
                         pbRecvBuffer,
@@ -633,11 +633,11 @@ main (
                     );
                 } else {
                        rv = reader_status; /* warning: not meaningful */
-                    SendMsg (
+                    send_msg (
                         VSC_Error,
                         mhHeader.reader_id,
                         &rv,
-                        sizeof (LONG)
+                        sizeof (uint32_t)
                     );
                 }
                 vreader_free(reader);
