@@ -99,7 +99,7 @@ vcard_response_new(VCard *card, unsigned char *buf,
     VCardResponse *new_response;
 
     if (len > Le) {
-	return vcard_init_buffer_response(card, buf, len);
+       return vcard_init_buffer_response(card, buf, len);
     }
     new_response = vcard_response_new_data(buf,len);
     if (new_response == NULL) {
@@ -119,7 +119,7 @@ vcard_response_new_bytes(VCard *card, unsigned char *buf, int len, int Le,
     VCardResponse *new_response;
 
     if (len > Le) {
-	return vcard_init_buffer_response(card, buf, len);
+       return vcard_init_buffer_response(card, buf, len);
     }
     new_response = vcard_response_new_data(buf,len);
     if (new_response == NULL) {
@@ -753,11 +753,11 @@ vcard_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response)
     }
     buffer_response = vcard_get_buffer_response(card);
     if (buffer_response && apdu->a_ins != VCARD7816_INS_GET_RESPONSE) {
-	/* clear out buffer_response, return an error */
+       /* clear out buffer_response, return an error */
         vcard_set_buffer_response(card,NULL);
         vcard_buffer_response_delete(buffer_response);
-	*response = vcard_make_response(VCARD7816_STATUS_EXC_ERROR);
-	return VCARD_DONE;
+       *response = vcard_make_response(VCARD7816_STATUS_EXC_ERROR);
+       return VCARD_DONE;
     }
 
     status = vcard_process_applet_apdu(card, apdu, response);
@@ -772,7 +772,7 @@ vcard_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response)
     case VCARD_DIRECT:
         /* if we are type direct, then the applet should handle everything */
         assert("VCARD_DIRECT: applet failure");
-	break;
+       break;
     }
     *response =
         vcard_make_response(VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);

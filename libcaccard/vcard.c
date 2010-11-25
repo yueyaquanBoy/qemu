@@ -73,12 +73,12 @@ vcard_reset(VCard *card, VCardPower power)
     VCardApplet *applet = NULL;
 
     if (card->type ==  VCARD_DIRECT) {
-	/* select the last applet */
+       /* select the last applet */
         VCardApplet *current_applet = NULL;
         for (current_applet = card->applet_list; current_applet;
                                        current_applet = current_applet->next) {
-	    applet = current_applet;
-	}
+           applet = current_applet;
+       }
     }
     for (i=0; i < MAX_CHANNEL; i++) {
         card->current_applet[i] = applet;
@@ -218,8 +218,8 @@ void
 vcard_get_atr(VCard *vcard, unsigned char *atr, int *atr_len)
 {
     if (vcard->vcard_get_atr) {
-	(*vcard->vcard_get_atr)(vcard, atr, atr_len);
-	return;
+       (*vcard->vcard_get_atr)(vcard, atr, atr_len);
+       return;
     }
     vcard_emul_get_atr(vcard, atr, atr_len);
 }
