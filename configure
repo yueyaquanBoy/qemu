@@ -2130,6 +2130,25 @@ EOF
   fi
 fi
 
+# check for libcaccard for smartcard support
+if test "$smartcard" != "no" ; then
+  smartcard_cflags="-I\$(SRC_PATH)/libcaccard"
+  smartcard_libs="-L\$(SRC_PATH)/libcaccard -lcaccard"
+  libcaccard_libs=$($pkgconfig --libs nss 2>/dev/null)
+  libcaccard_cflags=$($pkgconfig --cflags nss)
+  # TODO - what's the minimal nss version we support?
+  if $pkgconfig --atleast-version=3.12.8 nss; then
+    smartcard="yes"
+    QEMU_CFLAGS="$QEMU_CFLAGS $smartcard_cflags $libcaccard_cflags"
+    LIBS="$libcaccard_libs $LIBS"
+  else
+    if test "smartcard" = "yes" ; then
+      feature_not_found "smartcard"
+    fi
+    smartcard="no"
+  fi
+fi
+
 ##########################################
 
 ##########################################
@@ -2955,6 +2974,11 @@ if test "$target_linux_user" = "yes" ; then
 fi
 if test "$target_darwin_user" = "yes" ; then
   echo "CONFIG_DARWIN_USER=y" >> $config_target_mak
+fi
+if test "$smartcard" = "yes" ; then
+  echo "subdir-$target: subdir-libcaccard" >> $config_host_mak
+  echo "libcaccard_libs=$libcaccard_libs" >> $config_host_mak
+  echo "libcaccard_cflags=$libcaccard_cflags" >> $config_host_mak
 fi
 list=""
 if test ! -z "$gdb_xml_files" ; then
