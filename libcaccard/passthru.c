@@ -332,9 +332,6 @@ passthru_get_reader_state(SCARD_READERSTATE_A *reader_states,
     int i;
 
     for (i=0; i < reader_count; i++) {
-        if (name== NULL && reader_states[i].szReader == NULL) {
-            return &reader_states[i];
-        }
         if (name == NULL) continue;
         if (reader_states[i].szReader == NULL) continue;
         if (strcmp(name, reader_states[i].szReader) == 0) {
