@@ -22,7 +22,7 @@ void vcard_buffer_response_delete(VCardBufferResponse *buffer_response);
 void vcard_reset(VCard *card, VCardPower power);
 
 /*
- * applet utilities 
+ * applet utilities
  */
 /*
  * Constructor for a VCardApplet
@@ -45,7 +45,7 @@ void vcard_set_applet_private(VCardApplet *applet, VCardAppletPrivate *_private,
 void vcard_set_type(VCard *card, VCardType type);
 
 /*
- * utilities interacting with the current applet 
+ * utilities interacting with the current applet
  */
 /* add a new applet to a card */
 VCardStatus vcard_add_applet(VCard *card, VCardApplet *applet);
@@ -59,7 +59,7 @@ VCardAppletPrivate * vcard_get_current_applet_private(VCard *card, int channel);
 unsigned char *vcard_applet_get_aid(VCardApplet *applet, int *aid_len);
 
 /* process the apdu for the current selected applet/file */
-VCardStatus vcard_process_applet_apdu(VCard *card, VCardAPDU *apdu, 
+VCardStatus vcard_process_applet_apdu(VCard *card, VCardAPDU *apdu,
                                       VCardResponse **response);
 /*
  * VCard utilities

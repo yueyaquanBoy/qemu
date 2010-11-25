@@ -40,7 +40,7 @@ VCard7816Status vcard_emul_login(VCard *card, unsigned char *pin, int pin_len);
 /* delete a key */
 void vcard_emul_delete_key(VCardKey *key);
 /* RSA sign/decrypt with the key, signature happens 'in place' */
-VCard7816Status vcard_emul_rsa_op(VCard *card, VCardKey *key, 
+VCard7816Status vcard_emul_rsa_op(VCard *card, VCardKey *key,
                                   unsigned char *buffer, int buffer_size);
 
 void vcard_emul_reset(VCard *card, VCardPower power);

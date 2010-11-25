@@ -10,7 +10,7 @@
  * the card from the guest side, and thus does not try to get locks. This means
  * client access can interfere with the guest use of the card. 2) passthru does
  * not provide the guest and client unique login states for the card. That
- * means that it is possible for the guest to access private data on the 
+ * means that it is possible for the guest to access private data on the
  * card without authenticating. You have been warned.
  *
  * Passthru is most useful in the following cases: 1) provisioning. Card type
