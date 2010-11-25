@@ -2133,11 +2133,14 @@ fi
 # check for libcaccard for smartcard support
 if test "$smartcard" != "no" ; then
   smartcard_cflags="-I\$(SRC_PATH)/libcaccard"
-  smartcard_libs="-L\$(SRC_PATH)libcaccard -lcaccard"
+  smartcard_libs="-L\$(SRC_PATH)/libcaccard -lcaccard"
+  libcaccard_libs=$($pkgconfig --libs nss 2>/dev/null)
+  libcaccard_cflags=$($pkgconfig --cflags nss)
   # TODO - what's the minimal nss version we support?
   if $pkgconfig --atleast-version=3.12.8 nss; then
     smartcard="yes"
-    QEMU_CFLAGS="$QEMU_CFLAGS $smartcard_cflags"
+    QEMU_CFLAGS="$QEMU_CFLAGS $smartcard_cflags $libcaccard_cflags"
+    LIBS="$libcaccard_libs $LIBS"
   else
     if test "smartcard" = "yes" ; then
       feature_not_found "smartcard"
