@@ -100,7 +100,8 @@ vcard_reset(VCard *card, VCardPower power)
  */
 /* constructor */
 VCardApplet *
-vcard_new_applet(VCardProcessAPDU applet_process_function, VCardResetApplet applet_reset_function,
+vcard_new_applet(VCardProcessAPDU applet_process_function,
+                 VCardResetApplet applet_reset_function,
                  unsigned char *aid, int aid_len)
 {
     VCardApplet *applet;
@@ -300,10 +301,12 @@ vcard_get_current_applet_private(VCard *card, int channel)
 }
 
 VCardStatus
-vcard_process_applet_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response)
+vcard_process_applet_apdu(VCard *card, VCardAPDU *apdu,
+                          VCardResponse **response)
 {
     if (card->current_applet[apdu->a_channel]) {
-        return card->current_applet[apdu->a_channel]->process_apdu(card,apdu,response);
+        return card->current_applet[apdu->a_channel]->process_apdu(
+                                                        card, apdu, response);
     }
     return VCARD_NEXT;
 }

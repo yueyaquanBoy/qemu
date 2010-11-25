@@ -499,7 +499,8 @@ vreader_insert_card(VReader *reader, VCard *card)
     }
     reader->card = vcard_reference(card);
     vreader_unlock(reader);
-    vevent_queue_vevent(vevent_new(card ? VEVENT_CARD_INSERT : VEVENT_CARD_REMOVE, reader, card));
+    vevent_queue_vevent(vevent_new(
+        card ? VEVENT_CARD_INSERT : VEVENT_CARD_REMOVE, reader, card));
     return VREADER_OK;
 }
 

@@ -78,7 +78,8 @@ static int nss_emul_init = 0;
  * allocate the set of arrays for certs, cert_len, key
  */
 static PRBool
-vcard_emul_alloc_arrays(unsigned char ***certsp, int **cert_lenp, VCardKey ***keysp, int cert_count)
+vcard_emul_alloc_arrays(unsigned char ***certsp, int **cert_lenp,
+                        VCardKey ***keysp, int cert_count)
 {
     *certsp = NULL;
     *cert_lenp = NULL;
@@ -217,7 +218,8 @@ vcard_emul_map_error(int error)
 
 /* RSA sign/decrypt with the key, signature happens 'in place' */
 VCard7816Status 
-vcard_emul_rsa_op(VCard *card, VCardKey *key, unsigned char *buffer, int buffer_size)
+vcard_emul_rsa_op(VCard *card, VCardKey *key,
+                  unsigned char *buffer, int buffer_size)
 {
     SECKEYPrivateKey *priv_key;
     unsigned signature_len;
@@ -236,7 +238,8 @@ vcard_emul_rsa_op(VCard *card, VCardKey *key, unsigned char *buffer, int buffer_
     if (buffer_size != signature_len) {
         return  VCARD7816_STATUS_ERROR_DATA_INVALID;
     }
-    rv = PK11_PrivDecryptRaw(priv_key, buffer, &signature_len, signature_len, buffer, buffer_size);
+    rv = PK11_PrivDecryptRaw(priv_key, buffer, &signature_len, signature_len,
+                             buffer, buffer_size);
     if (rv != SECSuccess) {
         return vcard_emul_map_error(PORT_GetError());
     }
@@ -247,7 +250,8 @@ vcard_emul_rsa_op(VCard *card, VCardKey *key, unsigned char *buffer, int buffer_
 /*
  * Login functions
  */
-/* return the number of login attempts still possible on the card. if unknown, return -1 */
+/* return the number of login attempts still possible on the card. if unknown,
+ * return -1 */
 int 
 vcard_emul_get_login_count(VCard *card)
 {
@@ -268,9 +272,10 @@ vcard_emul_login(VCard *card, unsigned char *pin, int pin_len)
     }
     slot = vcard_emul_card_get_slot(card);
      /* We depend on the PKCS #11 module internal login state here because we
-      * create a separate process to handle each guest instance. If we needed to handle multiple
-      * guests from one process, then we would need to keep a lot of extra state in our card
-      * structure*/
+      * create a separate process to handle each guest instance. If we needed
+      * to handle multiple guests from one process, then we would need to keep
+      * a lot of extra state in our card structure
+      * */
     pin_string = malloc(pin_len+1);
     if (pin_string == NULL) {
         return VCARD7816_STATUS_EXC_ERROR_MEMORY_FAILURE;
@@ -284,7 +289,8 @@ vcard_emul_login(VCard *card, unsigned char *pin, int pin_len)
     }
 
     rv = PK11_Authenticate(slot, PR_FALSE, pin_string);
-    memset(pin_string, 0, pin_len);  /* don't let the pin hang around in memory to be snooped */
+    memset(pin_string, 0, pin_len);  /* don't let the pin hang around in memory
+                                        to be snooped */
     free(pin_string);
     if (rv == SECSuccess) {
         return VCARD7816_STATUS_SUCCESS;
@@ -302,7 +308,8 @@ vcard_emul_reset(VCard *card, VCardPower power)
         return;
     }
 
-    /* if we reset the card (either power on or power off), we loose our login state */
+    /* if we reset the card (either power on or power off), we loose our login
+     * state */
     /* TODO: we may also need to send insertion/removal events? */
     slot = vcard_emul_card_get_slot(card);
     (void)PK11_Logout(slot);
@@ -412,8 +419,9 @@ vcard_emul_reader_get_slot(VReader *vreader)
 }
 
 /*
- *  Card ATR's map to physical cards. VCARD_ATR_PREFIX will set appropriate historical bytes for
- *  any software emulated card. The remaining bytes can be used to indicate the actual emulator
+ *  Card ATR's map to physical cards. VCARD_ATR_PREFIX will set appropriate
+ *  historical bytes for any software emulated card. The remaining bytes can be
+ *  used to indicate the actual emulator
  */
 static const unsigned char nss_atr[] = { VCARD_ATR_PREFIX(3), 'N', 'S', 'S' };
 /*const static unsigned char nss_atr[] = { 0x3B, 0x6B, 0, 0, 0x80, 0x65, 0xB0, 

@@ -80,7 +80,8 @@ vcard_init_buffer_response(VCard *card, unsigned char *buf, int len)
     if (buffer_response == NULL) {
         return NULL;
     }
-    response = vcard_response_new_status_bytes(VCARD7816_SW1_RESPONSE_BYTES, len > 255 ? 0 : len);
+    response = vcard_response_new_status_bytes(VCARD7816_SW1_RESPONSE_BYTES,
+                                               len > 255 ? 0 : len);
     if (response == NULL) {
         return NULL;
     }
@@ -92,7 +93,8 @@ vcard_init_buffer_response(VCard *card, unsigned char *buf, int len)
  * general buffer to hold results from APDU calls
  */
 VCardResponse *
-vcard_response_new(VCard *card, unsigned char *buf, int len, int Le, VCard7816Status status)
+vcard_response_new(VCard *card, unsigned char *buf,
+                   int len, int Le, VCard7816Status status)
 {
     VCardResponse *new_response;
 
@@ -240,7 +242,8 @@ vcard_apdu_set_class(VCardAPDU *apdu) {
     case 0xe0:
     case 0xf0:
     default:
-        apdu->a_gen_type = (apdu->a_cla == 0xff)? VCARD_7816_PTS : VCARD_7816_PROPIETARY;
+        apdu->a_gen_type =
+            (apdu->a_cla == 0xff)? VCARD_7816_PTS : VCARD_7816_PROPIETARY;
         break;
     }
     return VCARD7816_STATUS_SUCCESS;
@@ -281,7 +284,8 @@ vcard_apdu_set_length(VCardAPDU *apdu)
                 return VCARD7816_STATUS_ERROR_WRONG_LENGTH;
             }
             /* calculate the first extended value. Could be either Le or Lc */
-            Le = (apdu->a_header->ah_body[0] << 8) || apdu->a_header->ah_body[1];
+            Le = (apdu->a_header->ah_body[0] << 8)
+               || apdu->a_header->ah_body[1];
             if (L == 3) {
                 /* 2E extended, return data only */
                 /*   zero maps to 65536 */
@@ -302,7 +306,8 @@ vcard_apdu_set_length(VCardAPDU *apdu)
             }
             if (L == Le+5) {
                 /* 4E extended, parameters and return data */
-                Le = (apdu->a_data[apdu->a_len-2] << 8) || apdu->a_data[apdu->a_len-1];
+                Le = (apdu->a_data[apdu->a_len-2] << 8)
+                   || apdu->a_data[apdu->a_len-1];
                 apdu->a_Le = Le ? Le : 65536;
                 return VCARD7816_STATUS_SUCCESS;
             }
@@ -525,11 +530,13 @@ vcard_make_response(VCard7816Status status)
  * Add File card support here if you need it.
  */
 static VCardStatus
-vcard7816_file_system_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response)
+vcard7816_file_system_process_apdu(VCard *card, VCardAPDU *apdu,
+                                   VCardResponse **response)
 {
     /* TODO: if we want to support a virtual file system card, we do it here.
      * It would probably be a pkcs #15 card type */
-    *response = vcard_make_response(VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);
+    *response = vcard_make_response(
+                    VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);
     return VCARD_DONE;
 }
 
@@ -537,7 +544,8 @@ vcard7816_file_system_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse *
  * VM card (including java cards)
  */
 static VCardStatus
-vcard7816_vm_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response)
+vcard7816_vm_process_apdu(VCard *card, VCardAPDU *apdu,
+                          VCardResponse **response)
 {
     int bytes_to_copy, next_byte_count, count;
     VCardApplet *current_applet;
@@ -546,7 +554,8 @@ vcard7816_vm_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response
 
     /* parse the class first */
     if (apdu->a_gen_type !=  VCARD_7816_ISO) {
-        *response = vcard_make_response(VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);
+        *response = vcard_make_response(
+                        VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);
         return VCARD_DONE;
     }
 
@@ -561,7 +570,8 @@ vcard7816_vm_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response
     default:
         /* for now, don't try to support secure channel stuff in the
          * virtual card. */
-        *response = vcard_make_response(VCARD7816_STATUS_ERROR_SECURE_NOT_SUPPORTED);
+        *response = vcard_make_response(
+                        VCARD7816_STATUS_ERROR_SECURE_NOT_SUPPORTED);
         return VCARD_DONE;
     }
 
@@ -581,7 +591,8 @@ vcard7816_vm_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response
     case  VCARD7816_INS_APPEND_RECORD: /* file op */
     case  VCARD7816_INS_ENVELOPE:
     case  VCARD7816_INS_PUT_DATA:
-        *response = vcard_make_response(VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);
+        *response = vcard_make_response(
+                        VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);
         break;
 
     case  VCARD7816_INS_SELECT_FILE:
@@ -590,36 +601,43 @@ vcard7816_vm_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response
             break;
         }
 
-        /* side effect, deselect the current applet if no applet has been found */
+        /* side effect, deselect the current applet if no applet has been found
+         * */
         current_applet = vcard_find_applet(card, apdu->a_body, apdu->a_Lc);
         vcard_select_applet(card, apdu->a_channel, current_applet);
         if (current_applet) {
             unsigned char *aid;
             int aid_len;
             aid = vcard_applet_get_aid(current_applet, &aid_len);
-           *response = vcard_response_new(card, aid, aid_len, apdu->a_Le, VCARD7816_STATUS_SUCCESS);
+           *response = vcard_response_new(card, aid, aid_len, apdu->a_Le,
+                                          VCARD7816_STATUS_SUCCESS);
         } else {
-           *response = vcard_make_response(VCARD7816_STATUS_ERROR_FILE_NOT_FOUND);
+           *response = vcard_make_response(
+                             VCARD7816_STATUS_ERROR_FILE_NOT_FOUND);
         }
         break;
 
     case  VCARD7816_INS_VERIFY:
         if ((apdu->a_p1 != 0x00) || (apdu->a_p2 != 0x00)) {
-            *response = vcard_make_response(VCARD7816_STATUS_ERROR_WRONG_PARAMETERS);
+            *response = vcard_make_response(
+                            VCARD7816_STATUS_ERROR_WRONG_PARAMETERS);
         } else {
             if (apdu->a_Lc == 0) {
                 /* handle pin count if possible */
                 count = vcard_emul_get_login_count(card);
                 if (count < 0) {
-                    *response = vcard_make_response(VCARD7816_STATUS_ERROR_DATA_NOT_FOUND);
+                    *response = vcard_make_response(
+                                    VCARD7816_STATUS_ERROR_DATA_NOT_FOUND);
                 } else {
                     if (count > 0xf) {
                         count = 0xf;
                     }
-                    *response = vcard_response_new_status_bytes(VCARD7816_SW1_WARNING_CHANGE,
+                    *response = vcard_response_new_status_bytes(
+                                                VCARD7816_SW1_WARNING_CHANGE,
                                                                 0xc0 | count);
                     if (*response == NULL) {
-                        *response = vcard_make_response(VCARD7816_STATUS_EXC_ERROR_MEMORY_FAILURE);
+                        *response = vcard_make_response(
+                                    VCARD7816_STATUS_EXC_ERROR_MEMORY_FAILURE);
                     }
                 }
             } else {
@@ -632,16 +650,18 @@ vcard7816_vm_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response
     case VCARD7816_INS_GET_RESPONSE:
         buffer_response = vcard_get_buffer_response(card);
         if (!buffer_response) {
-            *response = vcard_make_response(VCARD7816_STATUS_ERROR_DATA_NOT_FOUND);
+            *response = vcard_make_response(
+                            VCARD7816_STATUS_ERROR_DATA_NOT_FOUND);
             /* handle error */
         }
         bytes_to_copy = MIN(buffer_response->len, apdu->a_Le);
         next_byte_count = MIN(256, buffer_response->len - bytes_to_copy);
-        *response = vcard_response_new_bytes(card, buffer_response->current, bytes_to_copy,
-                                             apdu->a_Le,
-                                             next_byte_count ?
-                                             VCARD7816_SW1_RESPONSE_BYTES: VCARD7816_SW1_SUCCESS,
-                                             next_byte_count);
+        *response = vcard_response_new_bytes(
+                        card, buffer_response->current, bytes_to_copy,
+                        apdu->a_Le,
+                        next_byte_count ?
+                        VCARD7816_SW1_RESPONSE_BYTES: VCARD7816_SW1_SUCCESS,
+                        next_byte_count);
         buffer_response->current += bytes_to_copy;
         buffer_response->len -= bytes_to_copy;
         if (*response == NULL || (next_byte_count == 0)) {
@@ -649,16 +669,19 @@ vcard7816_vm_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response
             vcard_buffer_response_delete(buffer_response);
         }
         if (*response == NULL) {
-            *response = vcard_make_response(VCARD7816_STATUS_EXC_ERROR_MEMORY_FAILURE);
+            *response =
+                vcard_make_response(VCARD7816_STATUS_EXC_ERROR_MEMORY_FAILURE);
         }
         break;
 
     case VCARD7816_INS_GET_DATA:
-        *response = vcard_make_response(VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);
+        *response =
+            vcard_make_response(VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);
         break;
 
     default:
-        *response = vcard_make_response(VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);
+        *response =
+            vcard_make_response(VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);
         break;
     }
 
@@ -709,6 +732,7 @@ vcard_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response)
         assert("VCARD_DIRECT: applet failure");
 	break;
     }
-    *response = vcard_make_response(VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);
+    *response =
+        vcard_make_response(VCARD7816_STATUS_ERROR_COMMAND_NOT_SUPPORTED);
     return VCARD_DONE;
 }

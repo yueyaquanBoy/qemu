@@ -1,5 +1,6 @@
 /*
- * defines the entry point for the cac card. Only used by cac.c anc vcard_emul_type.c
+ * defines the entry point for the cac card. Only used by cac.c anc
+ * vcard_emul_type.c
  */
 #ifndef CAC_H
 #define CAC_H 1
@@ -10,7 +11,8 @@
  * the rest are connected through function pointers.
  */
 VCardStatus cac_card_init(VReader *reader, VCard *card, const char *params,
-              unsigned char * const *cert, int cert_len[], VCardKey *key[] /* adopt the keys*/,
+              unsigned char * const *cert, int cert_len[],
+              VCardKey *key[] /* adopt the keys*/,
               int cert_count);
 
 /* not yet implemented */

@@ -4,8 +4,10 @@
 #include <stdio.h>
 #include "vcard.h"
 
-VCardStatus cac_card_init(const char *flags, VCard *card, const unsigned char *cert[], 
-                int cert_len[], VCardKey *key[] /* adopt the keys*/, int cert_count);
+VCardStatus cac_card_init(const char *flags, VCard *card,
+                const unsigned char *cert[],
+                int cert_len[], VCardKey *key[] /* adopt the keys*/,
+                int cert_count);
 /*
  * this will crash... just test the linkage right now
  */

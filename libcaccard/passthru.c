@@ -56,7 +56,8 @@ passthru_process_apdu(VCard *card, VCardAPDU *apdu, VCardResponse **response)
 
     *response = vcard_response_new_data(buf,len);
     if (*response == NULL) {
-       *response = vcard_make_response(VCARD7816_STATUS_EXC_ERROR_MEMORY_FAILURE);
+       *response =
+            vcard_make_response(VCARD7816_STATUS_EXC_ERROR_MEMORY_FAILURE);
     } else {
        (*response)->b_total_len = (*response)->b_len;
     }
@@ -82,8 +83,8 @@ static void passthru_card_get_atr(VCard *card, unsigned char *atr, int *atr_len)
 
     applet_private = vcard_get_current_applet_private(card, 0);
     if ((applet_private == NULL) || (applet_private->atr_len == 0)) {
-	vcard_emul_get_atr(card, atr, atr_len);
-	return;
+        vcard_emul_get_atr(card, atr, atr_len);
+        return;
     }
     *atr_len = MIN(applet_private->atr_len, *atr_len);
     memcpy(atr,applet_private->atr,*atr_len);
@@ -161,7 +162,8 @@ passthru_get_reader_name(VReader *reader)
        return NULL;
     }
     reader_list = (char *)malloc(reader_string_length);
-    rv = SCardListReaders(global_context, NULL, reader_list, &reader_string_length);
+    rv = SCardListReaders(global_context, NULL, reader_list,
+                          &reader_string_length);
     if (rv !=  SCARD_S_SUCCESS) {
        goto cleanup;
     }
@@ -189,10 +191,10 @@ static void
 passthru_delete_applet_private(VCardAppletPrivate *applet_private)
 {
     if (applet_private == NULL) {
-	return;
+        return;
     }
     if (applet_private->hCard) {
-	SCardDisconnect(applet_private->hCard,SCARD_LEAVE_CARD);
+        SCardDisconnect(applet_private->hCard,SCARD_LEAVE_CARD);
     }
     if (applet_private->reader_name != NULL) {
         free(applet_private->reader_name);
@@ -220,16 +222,17 @@ passthru_new_applet_private(VReader *reader)
     }
 
     rv = SCardConnect( global_context, applet_private->reader_name,
-       SCARD_SHARE_DIRECT, SCARD_PROTOCOL_T0|SCARD_PROTOCOL_T1, &applet_private->hCard,
+       SCARD_SHARE_DIRECT, SCARD_PROTOCOL_T0|SCARD_PROTOCOL_T1,
+        &applet_private->hCard,
         &applet_private->hProtocol);
     if (rv !=  SCARD_S_SUCCESS) {
         goto fail;
     }
 
     if (applet_private->hProtocol == SCARD_PROTOCOL_T0) {
-	applet_private->send_io = SCARD_PCI_T0;
+        applet_private->send_io = SCARD_PCI_T0;
     } else {
-	applet_private->send_io = SCARD_PCI_T1;
+        applet_private->send_io = SCARD_PCI_T1;
     }
     applet_private->atr_len = 0;
     return applet_private;
@@ -314,13 +317,8 @@ failure:
 }
 
 /*
- *
- *
- *
- *  Begin passthru_emul code. This emulator only works with the passthru card type.
- *
- *
- *
+ *  Begin passthru_emul code. This emulator only works with the passthru card
+ *  type.
  *
  */
 
@@ -328,7 +326,8 @@ failure:
  *  Get the state entry that matches this reader. If none found, return NULL
  */
 static SCARD_READERSTATE_A *
-passthru_get_reader_state(SCARD_READERSTATE_A *reader_states, int reader_count, char *name)
+passthru_get_reader_state(SCARD_READERSTATE_A *reader_states,
+                          int reader_count, char *name)
 {
     int i;
 
@@ -356,8 +355,8 @@ passthru_get_blank_reader(SCARD_READERSTATE_A *reader_states, int reader_count)
 
 
 /*
- *  This is the main work of the emulator, handling the thread that looks for changes in the
- *  readers and the cards.
+ *  This is the main work of the emulator, handling the thread that looks for
+ *  changes in the readers and the cards.
  */
 static void *
 passthru_emul_event_thread(void *args)
@@ -366,13 +365,15 @@ passthru_emul_event_thread(void *args)
     int reader_list_len = 0;
     SCARD_READERSTATE_A *reader_states = NULL;
     int reader_count = 0;     /* number of active readers */
-    int max_reader_count = 0; /* size of the reader_state array (including inactive readers) */
+    int max_reader_count = 0; /* size of the reader_state array (including
+                                 inactive readers) */
     LONG rv;
     int timeout=1000;
     int i;
 
     do {
-        /* variables to hold on to our new values until we are ready to replace our old values */
+        /* variables to hold on to our new values until we are ready to replace
+         * our old values */
         char *new_reader_list = NULL;
         int new_reader_list_len = 0;
         int new_reader_count = 0;
@@ -398,7 +399,8 @@ passthru_emul_event_thread(void *args)
             if (new_reader_list == NULL) {
                 goto next;
             }
-            rv = SCardListReaders(global_context, NULL, new_reader_list, &new_reader_list_len);
+            rv = SCardListReaders(global_context, NULL, new_reader_list,
+                                  &new_reader_list_len);
             if (rv !=  SCARD_S_SUCCESS) {
                 free(new_reader_list);
                 goto next;
@@ -409,11 +411,12 @@ passthru_emul_event_thread(void *args)
             }
             /* count the readers and mark the ones that are still with us */
             for (reader_entry = new_reader_list; *reader_entry;
-                                                  reader_entry += strlen(reader_entry)+1) {
+                 reader_entry += strlen(reader_entry)+1) {
                 SCARD_READERSTATE_A *this_state;
                 new_reader_count++;
                 /* if the reader is still on the list, mark it present */
-                this_state = passthru_get_reader_state(reader_states, reader_count,
+                this_state = passthru_get_reader_state(reader_states,
+                                                       reader_count,
                                                        reader_entry);
                 if (this_state) {
                     this_state->dwEventState = SCARD_STATE_PRESENT;
@@ -432,13 +435,14 @@ passthru_emul_event_thread(void *args)
             }
             /* handle the shrinking list */
             if (new_reader_count < reader_count) {
-                /* fold all the valid entries at the end of our reader_states array up into
-                 * those locations vacated by ejected readers. */
+                /* fold all the valid entries at the end of our reader_states
+                 * array up into those locations vacated by ejected readers. */
                 for (i=reader_count-1; i < (new_reader_count -1); i--) {
                         if (reader_states[i].szReader) {
                             SCARD_READERSTATE_A *blank_reader;
-                            blank_reader = passthru_get_blank_reader(reader_states,
-                                                                     new_reader_count);
+                            blank_reader =
+                                passthru_get_blank_reader(reader_states,
+                                                          new_reader_count);
                             assert(blank_reader);
                             *blank_reader = reader_states[i];
                             reader_states[i].szReader = NULL;
@@ -450,15 +454,18 @@ passthru_emul_event_thread(void *args)
                 SCARD_READERSTATE_A *new_reader_states;
 
                 /* grow the list */
-                new_reader_states = (SCARD_READERSTATE_A *)realloc(reader_states,
-                                        sizeof(SCARD_READERSTATE_A)*new_reader_count);
+                new_reader_states =
+                    (SCARD_READERSTATE_A *)realloc(reader_states,
+                        sizeof(SCARD_READERSTATE_A)*new_reader_count);
                 if (new_reader_states) {
                     /* successful, update our current state */
                     reader_states = new_reader_states;
                     max_reader_count = new_reader_count;
                 } else {
-                    new_reader_count = max_reader_count; /* couldn't get enough space to handle
-                                                          * all the new readers */
+                    new_reader_count = max_reader_count; /* couldn't get enough
+                                                          * space to handle
+                                                          * all the new readers
+                                                          * */
                 }
                 /* mark our new entries as empty */
                 for (i=reader_count; i > new_reader_count; i++) {
@@ -467,20 +474,23 @@ passthru_emul_event_thread(void *args)
             }
             /* now walk the reader list, updating the state */
             for (reader_entry = new_reader_list; *reader_entry;
-                                                  reader_entry += strlen(reader_entry)+1) {
+                 reader_entry += strlen(reader_entry)+1) {
                 SCARD_READERSTATE_A *this_state;
-                this_state = passthru_get_reader_state(reader_states, new_reader_count,
+                this_state = passthru_get_reader_state(reader_states,
+                                                       new_reader_count,
                                                        reader_entry);
                 if (this_state) {
-                    /* replace the old copy of the string with the new copy. This will allow us
-                     * to free reader_list at the end */
+                    /* replace the old copy of the string with the new copy.
+                     * This will allow us to free reader_list at the end */
                     reader_states->szReader = reader_entry;
                     continue;
                 }
                 /* this is a new reader, add it to the list */
-                this_state = passthru_get_blank_reader(reader_states, new_reader_count);
+                this_state =
+                    passthru_get_blank_reader(reader_states, new_reader_count);
                 if (!this_state) {
-                    continue; /* this can happen of we couldn't get enough slots in the grow list */
+                    continue; /* this can happen of we couldn't get enough
+                                 slots in the grow list */
                 }
                 this_state->szReader = reader_entry;
                 this_state->dwCurrentState = SCARD_STATE_UNAWARE;
@@ -497,7 +507,8 @@ passthru_emul_event_thread(void *args)
             reader_count = new_reader_count;
         }
 next:
-        rv = SCardGetStatusChange(global_context, timeout, reader_states, reader_count);
+        rv = SCardGetStatusChange(global_context, timeout,
+                                  reader_states, reader_count);
         if (rv == SCARD_E_TIMEOUT) {
             continue; /* check for new readers */
         }
@@ -537,16 +548,19 @@ next:
             if (reader_states[i].dwEventState & SCARD_STATE_PRESENT) {
                 VCard *card;
                 VCardStatus status = VCARD_FAIL;
-                /* if there already was a card present, eject it before we insert the new one */
+                /* if there already was a card present, eject it before we
+                 * insert the new one */
                 if (vreader_card_is_present(reader) == VREADER_OK) {
                     vreader_insert_card(reader, NULL);
                 }
 
                 card = vcard_new(NULL, NULL);
                 if (card != NULL) {
-                    status = passthru_card_init(reader, card, "", NULL, NULL, NULL, 0);
-		    passthru_card_set_atr(card, reader_states[i].rgbAtr, reader_states[i].cbAtr);
-		    vcard_set_atr_func(card, passthru_card_get_atr);
+                    status = passthru_card_init(reader, card, "",
+                                                NULL, NULL, NULL, 0);
+                    passthru_card_set_atr(card, reader_states[i].rgbAtr,
+                                  reader_states[i].cbAtr);
+                    vcard_set_atr_func(card, passthru_card_get_atr);
                 }
                 if (status == VCARD_DONE) {
                     vreader_insert_card(reader, card);
@@ -561,8 +575,8 @@ next:
 }
 
 /*
- *  Initializing the passthru emul is simply initializing pcsc-lite and launching the event
- *  thread.
+ *  Initializing the passthru emul is simply initializing pcsc-lite and
+ *  launching the event thread.
  */
 VCardStatus
 passthru_emul_init(VCardEmulOptions *options)
