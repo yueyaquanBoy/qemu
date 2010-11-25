@@ -424,8 +424,7 @@ vcard_emul_reader_get_slot(VReader *vreader)
  *  used to indicate the actual emulator
  */
 static const unsigned char nss_atr[] = { VCARD_ATR_PREFIX(3), 'N', 'S', 'S' };
-/*const static unsigned char nss_atr[] = { 0x3B, 0x6B, 0, 0, 0x80, 0x65, 0xB0, 
-                                         0x83, 1, 4, 0x74, 0x83, 0,  0x90, 0  }; */
+
 void 
 vcard_emul_get_atr(VCard *card, unsigned char *atr, int *atr_len)
 {
