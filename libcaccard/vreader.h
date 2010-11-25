@@ -30,8 +30,8 @@ void vreader_free(VReader *reader);
 VReaderEmul *vreader_get_private(VReader *);
 VReaderStatus vreader_card_is_present(VReader *reader);
 const char *vreader_get_name(VReader *reader);
-VReaderID vreader_get_id(VReader *reader);
-VReaderStatus vreader_set_id(VReader *reader, VReaderID id);
+vreader_id_t vreader_get_id(VReader *reader);
+VReaderStatus vreader_set_id(VReader *reader, vreader_id_t id);
 
 /* list operations */
 VReaderList *vreader_get_reader_list(void);
@@ -39,7 +39,7 @@ void vreader_list_delete(VReaderList *list);
 VReader *vreader_list_get_reader(VReaderListEntry *entry);
 VReaderListEntry *vreader_list_get_first(VReaderList *list);
 VReaderListEntry *vreader_list_get_next(VReaderListEntry *list);
-VReader *vreader_get_reader_by_id(VReaderID id);
+VReader *vreader_get_reader_by_id(vreader_id_t id);
 VReader *vreader_get_reader_by_name(const char *name);
 
 /*

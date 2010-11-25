@@ -22,7 +22,7 @@ struct VReaderStruct {
     int    reference_count;
     VCard *card;
     char *name;
-    VReaderID id;
+    vreader_id_t id;
     mutex_t lock;
     VReaderEmul  *reader_private;
     VReaderEmulFree reader_private_free;
@@ -58,7 +58,7 @@ vreader_new(const char *name, VReaderEmul *private,
     reader->reference_count = 1;
     reader->name = name ? strdup(name) : NULL;
     reader->card = NULL;
-    reader->id = (VReaderID)-1;
+    reader->id = (vreader_id_t)-1;
     reader->reader_private = private;
     reader->reader_private_free = private_free;
     return reader;
@@ -126,17 +126,17 @@ vreader_card_is_present(VReader *reader)
     return VREADER_OK;
 }
 
-VReaderID
+vreader_id_t
 vreader_get_id(VReader *reader)
 {
     if (reader == NULL) {
-        return (VReaderID)-1;
+        return (vreader_id_t)-1;
     }
     return reader->id;
 }
 
 VReaderStatus
-vreader_set_id(VReader *reader, VReaderID id)
+vreader_set_id(VReader *reader, vreader_id_t id)
 {
     if (reader == NULL) {
         return VREADER_NO_CARD;
@@ -404,12 +404,12 @@ vreader_get_reader_list(void)
 }
 
 VReader *
-vreader_get_reader_by_id(VReaderID id)
+vreader_get_reader_by_id(vreader_id_t id)
 {
     VReader *reader = NULL;
     VReaderListEntry *current_entry = NULL;
 
-    if (id == (VReaderID) -1) {
+    if (id == (vreader_id_t) -1) {
         return NULL;
     }
 

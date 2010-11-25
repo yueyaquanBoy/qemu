@@ -11,7 +11,7 @@ typedef enum {
     VREADER_OUT_OF_MEMORY
 } VReaderStatus;
 
-typedef unsigned int VReaderID;
+typedef unsigned int vreader_id_t;
 typedef struct VReaderStruct VReader;
 typedef struct VReaderListStruct VReaderList;
 typedef struct VReaderListEntryStruct VReaderListEntry;

@@ -267,7 +267,7 @@ do_command(void)
             for (reader_entry = vreader_list_get_first(list); reader_entry;
                  reader_entry = vreader_list_get_next(reader_entry)) {
                 VReader *reader = vreader_list_get_reader(reader_entry);
-                VReaderID reader_id;
+                vreader_id_t reader_id;
                 reader_id=vreader_get_id(reader);
                 if (reader_id == -1) {
                     continue;
@@ -333,7 +333,7 @@ do_command(void)
             for (reader_entry = vreader_list_get_first(list); reader_entry;
                  reader_entry = vreader_list_get_next(reader_entry)) {
                 VReader *reader = vreader_list_get_reader(reader_entry);
-                VReaderID reader_id;
+                vreader_id_t reader_id;
                 reader_id=vreader_get_id(reader);
                 if (reader_id == -1) {
                     continue;
@@ -347,7 +347,7 @@ do_command(void)
             for (reader_entry = vreader_list_get_first(list); reader_entry;
                  reader_entry = vreader_list_get_next(reader_entry)) {
                 VReader *reader = vreader_list_get_reader(reader_entry);
-                VReaderID reader_id;
+                vreader_id_t reader_id;
                 reader_id=vreader_get_id(reader);
                 if (reader_id != -1) {
                     continue;
