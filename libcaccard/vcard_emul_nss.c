@@ -159,7 +159,7 @@ vcard_emul_make_key(PK11SlotInfo *slot, CERTCertificate *cert)
 }
 
 /* destructor */
-void 
+void
 vcard_emul_delete_key(VCardKey *key)
 {
     if (!nss_emul_init || (key == NULL)) {
@@ -217,7 +217,7 @@ vcard_emul_map_error(int error)
 }
 
 /* RSA sign/decrypt with the key, signature happens 'in place' */
-VCard7816Status 
+VCard7816Status
 vcard_emul_rsa_op(VCard *card, VCardKey *key,
                   unsigned char *buffer, int buffer_size)
 {
@@ -252,14 +252,14 @@ vcard_emul_rsa_op(VCard *card, VCardKey *key,
  */
 /* return the number of login attempts still possible on the card. if unknown,
  * return -1 */
-int 
+int
 vcard_emul_get_login_count(VCard *card)
 {
     return -1;
 }
 
 /* login into the card, return the 7816 status word (sw2 || sw1) */
-VCard7816Status 
+VCard7816Status
 vcard_emul_login(VCard *card, unsigned char *pin, int pin_len)
 {
     PK11SlotInfo *slot;
@@ -299,7 +299,7 @@ vcard_emul_login(VCard *card, unsigned char *pin, int pin_len)
     return VCARD7816_STATUS_ERROR_CONDITION_NOT_SATISFIED;
 }
 
-void 
+void
 vcard_emul_reset(VCard *card, VCardPower power)
 {
     PK11SlotInfo *slot;
@@ -336,7 +336,7 @@ vcard_emul_find_vreader_from_slot(PK11SlotInfo *slot)
         vreader_free(reader);
     }
 
-    return NULL; 
+    return NULL;
 }
 
 /*
@@ -350,7 +350,7 @@ vreader_emul_new(PK11SlotInfo *slot, VCardEmulType type, const char *params)
     new_reader_emul = (VReaderEmul *)malloc(sizeof(VReaderEmul));
     if (new_reader_emul == NULL) {
         return NULL;
-    } 
+    }
 
     new_reader_emul->slot = PK11_ReferenceSlot(slot);
     new_reader_emul->default_type = type;
@@ -425,7 +425,7 @@ vcard_emul_reader_get_slot(VReader *vreader)
  */
 static const unsigned char nss_atr[] = { VCARD_ATR_PREFIX(3), 'N', 'S', 'S' };
 
-void 
+void
 vcard_emul_get_atr(VCard *card, unsigned char *atr, int *atr_len)
 {
     int len = MIN(sizeof(nss_atr), *atr_len);
@@ -515,13 +515,13 @@ vcard_emul_mirror_card(VReader *vreader)
         PK11_DestroyGenericObjects(firstObj);
         return NULL;
     }
-    
+
     /* allocate the arrays */
     ret = vcard_emul_alloc_arrays(&certs,&cert_len, &keys, cert_count);
     if (ret == PR_FALSE) {
         return NULL;
     }
- 
+
     /* fill in the arrays */
     cert_count = 0;
     for (thisObj = firstObj; thisObj; thisObj = PK11_GetNextGenericObject(thisObj)) {
@@ -568,7 +568,7 @@ vcard_emul_event_thread(void *arg)
     SECMODModule *module = (SECMODModule *)arg;
 
     do {
-         slot = SECMOD_WaitForAnyTokenEvent(module, 0, 500);
+        slot = SECMOD_WaitForAnyTokenEvent(module, 0, 500);
         if (slot == NULL) {
             break;
         }
@@ -582,7 +582,7 @@ vcard_emul_event_thread(void *arg)
             vreader_add_reader(vreader);
             vreader_free(vreader);
             continue;
-        } 
+        }
         /* card remove/insert */
         vreader_emul = vreader_get_private(vreader);
         if (PK11_IsPresent(slot)) {
@@ -936,8 +936,8 @@ find_blank(const char *str)
     }
     return str;
 }
-        
-        
+
+
 /*
  *  We really want to use some existing argument parsing library here. That would give
  *  us a consistant look */

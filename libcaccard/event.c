@@ -32,7 +32,7 @@ vevent_new(VEventType type, VReader *reader, VCard *card)
     return new_vevent;
 }
 
-void 
+void
 vevent_delete(VEvent *vevent)
 {
     if (vevent == NULL) {
@@ -59,7 +59,7 @@ void vevent_queue_init(void)
     vevent_queue_head = vevent_queue_tail = NULL;
 }
 
-void 
+void
 vevent_queue_vevent(VEvent *vevent)
 {
     vevent->next = NULL;

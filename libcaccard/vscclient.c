@@ -176,7 +176,7 @@ event_thread(void *arg)
             SendMsg (
                 VSC_ReaderAdd,
                 reader_id, /* currerntly VSCARD_UNDEFINED_READER_ID */
-		NULL, 0
+                NULL, 0
                 /*reader_name,
                 strlen(reader_name) */
             );
@@ -330,20 +330,20 @@ do_command(void)
                 reader_id=vreader_get_id(reader);
                 if (reader_id == -1) continue;
 
-		printf("%3d %s %s\n",reader_id,
+                printf("%3d %s %s\n",reader_id,
                        vreader_card_is_present(reader) == VREADER_OK ?
                        "CARD_PRESENT": "            ",
                        vreader_get_name(reader));
             }
-	    printf("Inactive Readers:\n");
-	    for (reader_entry = vreader_list_get_first(list); reader_entry;
-                                reader_entry = vreader_list_get_next(reader_entry)) {
+            printf("Inactive Readers:\n");
+            for (reader_entry = vreader_list_get_first(list); reader_entry;
+                 reader_entry = vreader_list_get_next(reader_entry)) {
                 VReader *reader = vreader_list_get_reader(reader_entry);
                 VReaderID reader_id;
                 reader_id=vreader_get_id(reader);
                 if (reader_id != -1) continue;
 
-		printf("INA %s %s\n",
+                printf("INA %s %s\n",
                        vreader_card_is_present(reader) == VREADER_OK ?
                        "CARD_PRESENT": "            ",
                        vreader_get_name(reader));
@@ -569,8 +569,8 @@ main (
         );
         if (rv < sizeof(mhHeader)) {
             /* Error */
-	    if (rv < 0) {
-		perror("header read error\n");
+            if (rv < 0) {
+                perror("header read error\n");
             } else {
                 printf ("header short read %ld\n", rv);
             }
@@ -684,7 +684,7 @@ if (verbose) {
                 break;
             default:
                 printf ("Default\n");
-		return 0;
+                return 0;
         }
     } while (rv >= 0);
 
