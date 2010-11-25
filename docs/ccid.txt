@@ -34,29 +34,18 @@ reader and smart card (i.e. not backed by a physical device) using this device.
 
 2. Building
 
-prerequisites:
- libcaccard
+The cryptographic functions and access to the physical card is done via NSS.
 
-At the moment there are no binary or source releases, so it has to be retrieved
-from source control:
+Installing NSS:
 
-    git clone git://anongit.freedesktop.org/~alon/cac_card
-
-fedora:
+In redhat/fedora:
     yum install nss-devel
-ubuntu:
+In ubuntu/debian:
     apt-get install libnss3-dev
     (not tested on ubuntu)
 
-build cac_card:
-    cd cac_card
-    ./configure && make && sudo make install
-
-qemu:
+Configuring and building:
     ./configure --enable-smartcard && make
-
-Note that if you install to a non default prefix you need to set
-PKG_CONFIG_PATH to compile qemu successfully.
 
 3. Using ccid-card-emulated with hardware
 
