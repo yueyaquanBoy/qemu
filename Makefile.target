@@ -381,6 +381,8 @@ obj-y += $(addprefix $(HWDIR)/, $(hw-obj-y))
 
 endif # CONFIG_SOFTMMU
 
+obj-y += $(addprefix ../libcacard/, $(libcacard-$(CONFIG_SMARTCARD_NSS)))
+
 obj-y += $(addprefix ../, $(trace-obj-y))
 obj-$(CONFIG_GDBSTUB_XML) += gdbstub-xml.o
 
