@@ -499,7 +499,7 @@ static CharDriverState *qemu_chr_open_mux(CharDriverState *drv)
 
 
 #ifdef _WIN32
-int send_all(int fd, const void *buf, int len1)
+static int do_send(int fd, const void *buf, int len1, bool nonblock)
 {
     int ret, len;
 
@@ -507,9 +507,14 @@ int send_all(int fd, const void *buf, int len1)
     while (len > 0) {
         ret = send(fd, buf, len, 0);
         if (ret < 0) {
+            if (nonblock && len1 - len) {
+                return len1 - len;
+            }
             errno = WSAGetLastError();
             if (errno != WSAEWOULDBLOCK) {
                 return -1;
+            } else if (errno == WSAEWOULDBLOCK && nonblock) {
+                return WSAEWOULDBLOCK;
             }
         } else if (ret == 0) {
             break;
@@ -523,7 +528,7 @@ int send_all(int fd, const void *buf, int len1)
 
 #else
 
-int send_all(int fd, const void *_buf, int len1)
+static int do_send(int fd, const void *_buf, int len1, bool nonblock)
 {
     int ret, len;
     const uint8_t *buf = _buf;
@@ -532,8 +537,15 @@ int send_all(int fd, const void *_buf, int len1)
     while (len > 0) {
         ret = write(fd, buf, len);
         if (ret < 0) {
-            if (errno != EINTR && errno != EAGAIN)
+            if (nonblock && len1 - len) {
+                return len1 - len;
+            }
+            if (errno == EAGAIN && nonblock) {
+                return -EAGAIN;
+            }
+            if (errno != EINTR && errno != EAGAIN) {
                 return -1;
+            }
         } else if (ret == 0) {
             break;
         } else {
@@ -544,6 +556,55 @@ int send_all(int fd, const void *_buf, int len1)
     return len1 - len;
 }
 #endif /* !_WIN32 */
+
+int send_all(CharDriverState *chr, int fd, const void *_buf, int len1)
+{
+    int ret, eagain_errno;
+    bool nonblock;
+
+    if (chr && chr->write_blocked) {
+        /*
+         * We don't handle this situation: the caller should not send
+         * us data while we're blocked.
+         *
+         * We could buffer this data here but that'll only encourage
+         * bad behaviour on part of the callers.
+         *
+         * Also, the data already in fd's buffers isn't easily
+         * migratable.  If we want full migration support, all the
+         * data landing here needs to be buffered and on migration,
+         * anything that's unsent needs to be transferred to the
+         * dest. machine (which again isn't a very good way of solving
+         * the problem, as the src may become writable just during
+         * migration and the reader could receive some data twice,
+         * essentially corrupting the data).
+         */
+        abort();
+    }
+
+    nonblock = false;
+    /*
+     * Ensure the char backend is able to receive and handle the
+     * 'write unblocked' event before we turn on nonblock support.
+     */
+    if (chr && chr->chr_enable_write_fd_handler && chr->chr_write_unblocked) {
+        nonblock = true;
+    }
+    ret = do_send(fd, _buf, len1, nonblock);
+
+#ifdef _WIN32
+    eagain_errno = WSAEWOULDBLOCK;
+#else
+    eagain_errno = -EAGAIN;
+#endif
+
+    if (nonblock && (ret == eagain_errno || (ret >= 0 && ret < len1))) {
+        /* Update fd handler to wake up when chr becomes writable */
+        chr->chr_enable_write_fd_handler(chr);
+        chr->write_blocked = true;
+    }
+    return ret;
+}
 
 #ifndef _WIN32
 
@@ -558,7 +619,7 @@ static int stdio_nb_clients = 0;
 static int fd_chr_write(CharDriverState *chr, const uint8_t *buf, int len)
 {
     FDCharDriver *s = chr->opaque;
-    return send_all(s->fd_out, buf, len);
+    return send_all(chr, s->fd_out, buf, len);
 }
 
 static int fd_chr_read_poll(void *opaque)
@@ -874,7 +935,7 @@ static int pty_chr_write(CharDriverState *chr, const uint8_t *buf, int len)
         pty_chr_update_read_handler(chr);
         return 0;
     }
-    return send_all(s->fd, buf, len);
+    return send_all(chr, s->fd, buf, len);
 }
 
 static int pty_chr_read_poll(void *opaque)
@@ -1943,8 +2004,14 @@ static void tcp_closed(void *opaque)
 static int tcp_chr_write(CharDriverState *chr, const uint8_t *buf, int len)
 {
     TCPCharDriver *s = chr->opaque;
+
     if (s->connected) {
-        return send_all(s->fd, buf, len);
+        int ret;
+
+        ret = send_all(chr, s->fd, buf, len);
+        if (ret == -1 && errno == EPIPE) {
+            tcp_closed(chr);
+        }
     } else {
         /* XXX: indicate an error ? */
         return len;
