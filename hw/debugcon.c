@@ -66,6 +66,9 @@ static uint32_t debugcon_ioport_read(void *opaque, uint32_t addr)
     return s->readback;
 }
 
+static const QemuChrHandlers debugcon_handlers = {
+};
+
 static void debugcon_init_core(DebugconState *s)
 {
     if (!s->chr) {
@@ -73,7 +76,7 @@ static void debugcon_init_core(DebugconState *s)
         exit(1);
     }
 
-    qemu_chr_add_handlers(s->chr, NULL, NULL, NULL, s);
+    qemu_chr_add_handlers(s->chr, &debugcon_handlers, s);
 }
 
 static int debugcon_isa_initfn(ISADevice *dev)
