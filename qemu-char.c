@@ -206,6 +206,7 @@ void qemu_chr_add_handlers(CharDriverState *s,
     }
     s->chr_can_read = handlers->fd_can_read;
     s->chr_read = handlers->fd_read;
+    s->chr_write_unblocked = handlers->fd_write_unblocked;
     s->chr_event = handlers->fd_event;
     s->handler_opaque = opaque;
     if (s->chr_update_read_handler)
@@ -216,6 +217,7 @@ void qemu_chr_add_handlers(CharDriverState *s,
     if (s->opened) {
         qemu_chr_generic_open(s);
     }
+    s->write_blocked = false;
 }
 
 static int null_chr_write(CharDriverState *chr, const uint8_t *buf, int len)
