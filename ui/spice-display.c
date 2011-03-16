@@ -62,13 +62,7 @@ void qemu_spice_rect_union(QXLRect *dest, const QXLRect *r)
     dest->right = MAX(dest->right, r->right);
 }
 
-/*
- * Called from spice server thread context (via interface_get_command).
- *
- * We must aquire the global qemu mutex here to make sure the
- * DisplayState (+DisplaySurface) we are accessing doesn't change
- * underneath us.
- */
+/* Called from io-thread context (via pipe_read) */
 SimpleSpiceUpdate *qemu_spice_create_update(SimpleSpiceDisplay *ssd)
 {
     SimpleSpiceUpdate *update;
@@ -78,9 +72,7 @@ SimpleSpiceUpdate *qemu_spice_create_update(SimpleSpiceDisplay *ssd)
     uint8_t *src, *dst;
     int by, bw, bh;
 
-    qemu_mutex_lock_iothread();
     if (qemu_spice_rect_is_empty(&ssd->dirty)) {
-        qemu_mutex_unlock_iothread();
         return NULL;
     };
 
@@ -141,7 +133,6 @@ SimpleSpiceUpdate *qemu_spice_create_update(SimpleSpiceDisplay *ssd)
     cmd->data = (intptr_t)drawable;
 
     memset(&ssd->dirty, 0, sizeof(ssd->dirty));
-    qemu_mutex_unlock_iothread();
     return update;
 }
 
@@ -169,6 +160,7 @@ void qemu_spice_create_host_memslot(SimpleSpiceDisplay *ssd)
     ssd->worker->add_memslot(ssd->worker, &memslot);
 }
 
+/* called from iothread (main) or a vcpu-thread */
 void qemu_spice_create_host_primary(SimpleSpiceDisplay *ssd)
 {
     QXLDevSurfaceCreate surface;
@@ -186,18 +178,14 @@ void qemu_spice_create_host_primary(SimpleSpiceDisplay *ssd)
     surface.mem        = (intptr_t)ssd->buf;
     surface.group_id   = MEMSLOT_GROUP_HOST;
 
-    qemu_mutex_unlock_iothread();
     ssd->worker->create_primary_surface(ssd->worker, 0, &surface);
-    qemu_mutex_lock_iothread();
 }
 
 void qemu_spice_destroy_host_primary(SimpleSpiceDisplay *ssd)
 {
     dprint(1, "%s:\n", __FUNCTION__);
 
-    qemu_mutex_unlock_iothread();
     ssd->worker->destroy_primary_surface(ssd->worker, 0);
-    qemu_mutex_lock_iothread();
 }
 
 void qemu_spice_vm_change_state_handler(void *opaque, int running, int reason)
@@ -207,9 +195,7 @@ void qemu_spice_vm_change_state_handler(void *opaque, int running, int reason)
     if (running) {
         ssd->worker->start(ssd->worker);
     } else {
-        qemu_mutex_unlock_iothread();
         ssd->worker->stop(ssd->worker);
-        qemu_mutex_lock_iothread();
     }
     ssd->running = running;
 }
@@ -233,6 +219,7 @@ void qemu_spice_display_update(SimpleSpiceDisplay *ssd,
     qemu_spice_rect_union(&ssd->dirty, &update_area);
 }
 
+/* called only from iothread (main) */
 void qemu_spice_display_resize(SimpleSpiceDisplay *ssd)
 {
     dprint(1, "%s:\n", __FUNCTION__);
