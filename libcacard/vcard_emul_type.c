@@ -12,6 +12,7 @@
 #include "vcardt.h"
 #include "vcard_emul_type.h"
 #include "cac.h"
+#include "passthru.h"
 
 VCardStatus vcard_init(VReader *vreader, VCard *vcard,
                        VCardEmulType type, const char *params,
@@ -24,6 +25,11 @@ VCardStatus vcard_init(VReader *vreader, VCard *vcard,
     case VCARD_EMUL_CAC:
         return cac_card_init(vreader, vcard, params,
                              cert, cert_len, key,  cert_count);
+#ifdef USE_PASSTHRU
+    case VCARD_EMUL_PASSTHRU:
+        return passthru_card_init(vreader, vcard, params,
+                                  cert, cert_len, key,  cert_count);
+#endif
     /* add new ones here */
     default:
         break;

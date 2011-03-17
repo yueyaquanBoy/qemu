@@ -357,7 +357,7 @@ endif
 ######################################################################
 # smartcard
 
-libcacard-y = cac.o event.o vcard.o vreader.o vcard_emul_nss.o vcard_emul_type.o card_7816.o
+libcacard-y = cac.o event.o passthru.o vcard.o vreader.o vcard_emul_nss.o vcard_emul_type.o card_7816.o
 
 vl.o: QEMU_CFLAGS+=$(GPROF_CFLAGS)
 

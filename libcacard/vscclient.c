@@ -30,6 +30,7 @@
 #include "vreader.h"
 #include "vcard_emul.h"
 #include "vevent.h"
+#include "passthru.h"
 
 int verbose;
 
@@ -500,6 +501,7 @@ main(
      VReaderStatus reader_status;
     VReader *reader = NULL;
     VCardEmulOptions *command_line_options = NULL;
+    int passthru = 0;
 
     char *cert_names[MAX_CERTS];
     char *emul_args = NULL;
@@ -519,8 +521,12 @@ main(
             emul_args = optarg;
             break;
         case 'p':
+#ifdef USE_PASSTHRU
+            passthru = 1;
+#else
             print_usage();
             exit(4);
+#endif
             break;
         case 'd':
             verbose = get_id_from_string(optarg, 1);
@@ -533,7 +539,7 @@ main(
         exit(4);
     }
 
-    if (cert_count > 0) {
+    if (!passthru && cert_count > 0) {
         char *new_args;
         int len, i;
         /* if we've given some -c options, we clearly we want do so some
@@ -559,7 +565,12 @@ main(
         emul_args = new_args;
     }
     if (emul_args) {
-        command_line_options = vcard_emul_options(emul_args);
+#ifdef USE_PASSTHRU
+        command_line_options = passthru ? passthru_emul_options(emul_args) :
+#else
+        command_line_options =
+#endif
+                                          vcard_emul_options(emul_args);
     }
 
     qemu_host = strdup(argv[argc - 2]);
@@ -570,7 +581,12 @@ main(
     qemu_mutex_init(&pending_reader_lock);
     qemu_cond_init(&pending_reader_condition);
 
-    vcard_emul_init(command_line_options);
+#ifdef USE_PASSTHRU
+    if (passthru) {
+        passthru_emul_init(command_line_options);
+    } else
+#endif
+        vcard_emul_init(command_line_options);
 
     printf("> ");
     fflush(stdout);
