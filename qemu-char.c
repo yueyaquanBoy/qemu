@@ -2020,10 +2020,9 @@ static void tcp_closed(void *opaque)
 static int tcp_chr_write(CharDriverState *chr, const uint8_t *buf, int len)
 {
     TCPCharDriver *s = chr->opaque;
+    int ret;
 
     if (s->connected) {
-        int ret;
-
         ret = send_all(chr, s->fd, buf, len);
         if (ret == -1 && errno == EPIPE) {
             tcp_closed(chr);
@@ -2036,13 +2035,14 @@ static int tcp_chr_write(CharDriverState *chr, const uint8_t *buf, int len)
                  * down.  Unthrottle when we re-connect.
                  */
                 chr->write_blocked = true;
-                return 0;
+                ret = 0;
             }
         }
     } else {
         /* XXX: indicate an error ? */
-        return len;
+        ret = len;
     }
+    return ret;
 }
 
 static int tcp_chr_read_poll(void *opaque)
