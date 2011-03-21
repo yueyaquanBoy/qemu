@@ -144,16 +144,18 @@ static CPUWriteMemoryFunc * const grlib_apbuart_write[] = {
     NULL, NULL, grlib_apbuart_writel,
 };
 
+static const QemuChrHandlers grlib_handlers = {
+    .fd_can_read = grlib_apbuart_can_receive,
+    .fd_read = grlib_apbuart_receive,
+    .fd_event = grlib_apbuart_event,
+};
+
 static int grlib_apbuart_init(SysBusDevice *dev)
 {
     UART *uart      = FROM_SYSBUS(typeof(*uart), dev);
     int   uart_regs = 0;
 
-    qemu_chr_add_handlers(uart->chr,
-                          grlib_apbuart_can_receive,
-                          grlib_apbuart_receive,
-                          grlib_apbuart_event,
-                          uart);
+    qemu_chr_add_handlers(uart->chr, &grlib_handlers, uart);
 
     sysbus_init_irq(dev, &uart->irq);
 

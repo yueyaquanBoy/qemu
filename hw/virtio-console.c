@@ -58,11 +58,16 @@ static void chr_event(void *opaque, int event)
     }
 }
 
+static const QemuChrHandlers chr_handlers = {
+    .fd_can_read = chr_can_read,
+    .fd_read = chr_read,
+    .fd_event = chr_event,
+};
+
 static int generic_port_init(VirtConsole *vcon, VirtIOSerialPort *port)
 {
     if (vcon->chr) {
-        qemu_chr_add_handlers(vcon->chr, chr_can_read, chr_read, chr_event,
-                              vcon);
+        qemu_chr_add_handlers(vcon->chr, &chr_handlers, vcon);
         vcon->port.info->have_data = flush_buf;
     }
     return 0;
@@ -86,7 +91,7 @@ static int virtconsole_exitfn(VirtIOSerialPort *port)
 	 * Instead of closing the chardev, free it so it can be used
 	 * for other purposes.
 	 */
-	qemu_chr_add_handlers(vcon->chr, NULL, NULL, NULL, NULL);
+	qemu_chr_add_handlers(vcon->chr, NULL, NULL);
     }
 
     return 0;
