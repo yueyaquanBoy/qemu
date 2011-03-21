@@ -116,6 +116,9 @@ size_t qemu_chr_mem_osize(const CharDriverState *chr);
 
 /* async I/O support */
 
+void enable_write_fd_handler(int fd, IOHandler *fd_write);
+void disable_write_fd_handler(int fd);
+
 int qemu_set_fd_handler2(int fd,
                          IOCanReadHandler *fd_read_poll,
                          IOHandler *fd_read,
