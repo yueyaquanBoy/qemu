@@ -613,6 +613,7 @@ void tcg_gen_callN(TCGContext *s, TCGv_ptr func, unsigned int flags,
     *gen_opc_ptr++ = INDEX_op_call;
     nparam = gen_opparam_ptr++;
 #ifdef TCG_TARGET_I386
+    (void)call_type;
     call_type = (flags & TCG_CALL_TYPE_MASK);
 #endif
     if (ret != TCG_CALL_DUMMY_ARG) {

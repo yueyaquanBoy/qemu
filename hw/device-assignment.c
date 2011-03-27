@@ -1708,6 +1708,7 @@ static int assigned_initfn(struct PCIDevice *pci_dev)
     uint8_t e_device, e_intx;
     int r;
 
+    (void)e_device;
     if (!kvm_enabled()) {
         error_report("pci-assign: error: requires KVM support");
         return -1;

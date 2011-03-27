@@ -931,6 +931,8 @@ static int kvm_get_xsave(CPUState *env)
     int ret, i;
     uint16_t cwd, swd, twd, fop;
 
+    (void)fop;
+
     if (!kvm_has_xsave()) {
         return kvm_get_fpu(env);
     }
