@@ -15,6 +15,8 @@ struct QemuThread {
     pthread_t thread;
 };
 
+#include <inttypes.h>
+
 typedef struct QemuMutex QemuMutex;
 typedef struct QemuCond QemuCond;
 typedef struct QemuThread QemuThread;
