@@ -199,6 +199,7 @@ hw-obj-$(CONFIG_FDC) += fdc.o
 hw-obj-$(CONFIG_APM) += pm_smbus.o apm.o
 hw-obj-$(CONFIG_DMA) += dma.o
 hw-obj-$(CONFIG_SMARTCARD) += usb-ccid.o ccid-card-passthru.o
+hw-obj-$(CONFIG_SMARTCARD_NSS) += ccid-card-emulated.o
 
 # PPC devices
 hw-obj-$(CONFIG_OPENPIC) += openpic.o
