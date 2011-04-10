@@ -275,6 +275,12 @@ static const uint8_t *passthru_get_atr(CCIDCardState *base, uint32_t *len)
     return card->atr;
 }
 
+static struct QemuChrHandlers ccid_card_passthru_handlers = {
+    .fd_can_read = ccid_card_vscard_can_read,
+    .fd_read = ccid_card_vscard_read,
+    .fd_event = ccid_card_vscard_event,
+};
+
 static int passthru_initfn(CCIDCardState *base)
 {
     PassthruState *card = DO_UPCAST(PassthruState, base, base);
@@ -283,10 +289,7 @@ static int passthru_initfn(CCIDCardState *base)
     card->vscard_in_hdr = 0;
     if (card->cs) {
         DPRINTF(card, D_INFO, "initing chardev\n");
-        qemu_chr_add_handlers(card->cs,
-            ccid_card_vscard_can_read,
-            ccid_card_vscard_read,
-            ccid_card_vscard_event, card);
+        qemu_chr_add_handlers(card->cs, &ccid_card_passthru_handlers, card);
         ccid_card_vscard_send_init(card);
     } else {
         error_report("missing chardev");
