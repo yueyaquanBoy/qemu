@@ -950,7 +950,7 @@ static int kvm_get_xsave(CPUState *env)
 #ifdef KVM_CAP_XSAVE
     struct kvm_xsave* xsave;
     int ret, i;
-    uint16_t cwd, swd, twd, fop;
+    uint16_t cwd, swd, twd;
 
     if (!kvm_has_xsave()) {
         return kvm_get_fpu(env);
@@ -966,7 +966,7 @@ static int kvm_get_xsave(CPUState *env)
     cwd = (uint16_t)xsave->region[0];
     swd = (uint16_t)(xsave->region[0] >> 16);
     twd = (uint16_t)xsave->region[1];
-    fop = (uint16_t)(xsave->region[1] >> 16);
+    /* fop = (uint16_t)(xsave->region[1] >> 16); */
     env->fpstt = (swd >> 11) & 7;
     env->fpus = swd;
     env->fpuc = cwd;
